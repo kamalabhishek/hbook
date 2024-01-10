@@ -44,7 +44,8 @@ jobs:
         uses: actions/configure-pages@v4
       - name: Create Symlink to External Content
         run: |
-          ln -s https://github.com/kamalabhishek/repo3/blob/main/docs.md content/product/
+          curl -LJO https://raw.githubusercontent.com/kamalabhishek/repo3/main/docs.md
+          ln -s docs.md content/product/docs.md
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
