@@ -1,3 +1,9 @@
+---
+title: Sample
+layout: default
+parent: Products
+---
+
 ## Code
 
 Inline `code`
