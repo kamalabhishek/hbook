@@ -42,12 +42,16 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
-      - name: Create Symlink to External Content
+      # - name: Create Symlink to External Content
+      #   run: |
+      #     ls
+      #     curl -LJO -u ${{ secrets.TEST_TOKEN }}:x-oauth-basic https://raw.githubusercontent.com/kamalabhishek/repo3/main/docs.md
+      #     mkdir -p content/product/
+      #     ln -s ../../docs.md content/product/docs.md
+      - name: Run Shell Script
         run: |
-          ls
-          curl -LJO -u ${{ secrets.TEST_TOKEN }}:x-oauth-basic https://raw.githubusercontent.com/kamalabhishek/repo3/main/docs.md
-          mkdir -p content/product/
-          ln -s ../../docs.md content/product/docs.md
+          chmod +x ./slink.sh
+          ./slink.sh
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
