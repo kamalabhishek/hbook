@@ -51,8 +51,8 @@ jobs:
       - name: Run Shell Script
         run: |
           ls
-          chmod +x slink.sh
-          ./slink.sh
+          chmod +x .github/scripts/slink.sh
+          .github/scripts/slink.sh
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
