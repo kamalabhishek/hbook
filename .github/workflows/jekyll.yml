@@ -50,8 +50,9 @@ jobs:
       #     ln -s ../../docs.md content/product/docs.md
       - name: Run Shell Script
         run: |
-          chmod +x ./slink.sh
-          ./slink.sh
+          ls
+          chmod +x ../scripts/slink.sh
+          ../scripts/slink.sh
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
