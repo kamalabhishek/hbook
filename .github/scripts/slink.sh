@@ -8,7 +8,7 @@ fetch_files() {
     local value=$3
 
     # Use curl to download the file from the specified repo
-    curl -LJO -u ${{ secrets.${repo}_TOKEN }}:x-oauth-basic "https://raw.githubusercontent.com/kamalabhishek/$repo/main/$value"
+    curl -LJO -u ${{ secrets.TEST_TOKEN }}:x-oauth-basic "https://raw.githubusercontent.com/kamalabhishek/$repo/main/$value"
 
     # Move the downloaded file to the specified directory in hbook
     mv "$value" "hbook/$key"
