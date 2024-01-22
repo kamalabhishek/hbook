@@ -1,4 +1,3 @@
 [
-  {"repo": "repo3", "key": "content/product/", "value": "docs.md"},
-  // Add more entries as needed
+  {"repo": "repo3", "key": "content/product/", "value": "docs.md"}
 ]
