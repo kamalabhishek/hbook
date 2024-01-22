@@ -15,7 +15,8 @@ fetch_files() {
     echo "Fetching file from repo: $repo, key: $key, value: $value"
 
     # Use curl to download the file from the specified repo
-    curl -LJO -u "$token":x-oauth-basic "https://raw.githubusercontent.com/kamalabhishek/$repo/main/$value"
+    # curl -LJO -u "$token":x-oauth-basic "https://raw.githubusercontent.com/kamalabhishek/$repo/main/$value"
+    curl -LJO -u "$token":x-oauth-basic "https://raw.githubusercontent.com/kamalabhishek/repo3/main/docs.md"
 
     # Move the downloaded file to the specified directory in hbook
     mv "$value" "$key"
