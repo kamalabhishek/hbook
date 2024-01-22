@@ -1,5 +1,9 @@
 # ln -s https://raw.githubusercontent.com/kamalabhishek/repo3/main/docs.md content/product/docs.md
+
 #!/bin/bash
+
+# Create the directory if it doesn't exist
+mkdir -p "hbook/content/product/"
 
 # Function to fetch files from a repository
 fetch_files() {
@@ -23,4 +27,3 @@ while IFS= read -r line; do
 
     fetch_files "$repo" "$key" "$value" "$TEST_TOKEN"
 done < files.json
-
