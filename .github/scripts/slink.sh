@@ -6,9 +6,10 @@ fetch_files() {
     local repo=$1
     local key=$2
     local value=$3
+    local token=$4
 
     # Use curl to download the file from the specified repo
-    curl -LJO -u ${{ secrets.TEST_TOKEN }}:x-oauth-basic "https://raw.githubusercontent.com/kamalabhishek/$repo/main/$value"
+    curl -LJO -u "$token":x-oauth-basic "https://raw.githubusercontent.com/kamalabhishek/$repo/main/$value"
 
     # Move the downloaded file to the specified directory in hbook
     mv "$value" "hbook/$key"
@@ -20,5 +21,6 @@ while IFS= read -r line; do
     key=$(echo "$line" | jq -r '.key')
     value=$(echo "$line" | jq -r '.value')
 
-    fetch_files "$repo" "$key" "$value"
+    fetch_files "$repo" "$key" "$value" "$TEST_TOKEN"
 done < files.json
+
