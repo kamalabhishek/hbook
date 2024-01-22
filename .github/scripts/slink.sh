@@ -28,6 +28,6 @@ while IFS= read -r line; do
     key=$(echo "$line" | jq -r '.key')
     value=$(echo "$line" | jq -r '.value')
 
-    fetch_files "$repo" "$key" "$value" "${{ secrets.TEST_TOKEN }}"
+    fetch_files "$repo" "$key" "$value" "$TEST_TOKEN"
 done < files.json
 
