@@ -5,10 +5,6 @@
 # Create the directory if it doesn't exist
 mkdir -p "content/product/"
 
-# Debugging: Print the content of files.json
-echo "Content of files.json:"
-cat files.json
-
 # Function to fetch files from a repository
 fetch_files() {
     local repo=$1
@@ -20,7 +16,7 @@ fetch_files() {
 
     # Use curl to download the file from the specified repo
     curl -LJO -u "$token":x-oauth-basic "https://raw.githubusercontent.com/kamalabhishek/$repo/main/$value"
-
+    ls
     # Move the downloaded file to the specified directory in hbook
     mv "$value" "$key"
 }
