@@ -3,7 +3,7 @@
 #!/bin/bash
 
 # Create the directory if it doesn't exist
-mkdir -p "hbook/content/product/"
+mkdir -p "content/product/"
 
 # Function to fetch files from a repository
 fetch_files() {
@@ -16,7 +16,7 @@ fetch_files() {
     curl -LJO -u "$token":x-oauth-basic "https://raw.githubusercontent.com/kamalabhishek/$repo/main/$value"
 
     # Move the downloaded file to the specified directory in hbook
-    mv "$value" "hbook/$key"
+    mv "$value" "$key"
 }
 
 # Read the JSON file and fetch files
