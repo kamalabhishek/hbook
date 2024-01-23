@@ -34,6 +34,6 @@
 
 
 
-curl -LJO -u https://raw.githubusercontent.com/kamalabhishek/repo3/main/docs.md
+curl -sL -H https://raw.githubusercontent.com/kamalabhishek/repo3/main/docs.md
 ls
 mv docs.md "content/product/"
