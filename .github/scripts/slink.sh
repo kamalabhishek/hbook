@@ -34,6 +34,6 @@
 
 
 
-curl -LJO -u ${{ secrets.TEST_TOKEN }}:x-oauth-basic https://raw.githubusercontent.com/kamalabhishek/repo3/main/docs.md
+curl -LJO -u https://raw.githubusercontent.com/kamalabhishek/repo3/main/docs.md
 ls
 mv docs.md "content/product/"
