@@ -61,7 +61,9 @@ jobs:
           find . -type l -name "*.md" -exec sh -c '
             SYMLINK_PATH=$1
             FILENAME=$(basename "$SYMLINK_PATH")
-            TARGET_PATH=$(readlink -f "$GITHUB_WORKSPACE/$SYMLINK_PATH")
+            # Resolve the symlink's path using realpath
+            TARGET_PATH=$(realpath "$GITHUB_WORKSPACE/$SYMLINK_PATH")
+            # Extract URL from the resolved symlink's path
             URL=$(cat "$TARGET_PATH")
             echo "url: $URL"
             echo "symlink: $SYMLINK_PATH"
