@@ -55,7 +55,7 @@ jobs:
       #     chmod +x .github/scripts/slink.sh
       #     .github/scripts/slink.sh
       - name: Copy symlinked content
-        run: rsync -avL --exclude=".git" $GITHUB_WORKSPACE/content/product $GITHUB_WORKSPACE/_site/content/product
+        run: rsync -avL --exclude=".git" content/product $GITHUB_WORKSPACE/_site/content/product
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
