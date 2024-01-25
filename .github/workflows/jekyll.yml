@@ -62,9 +62,9 @@ jobs:
             SYMLINK_PATH=$1
             TARGET_PATH=$(readlink -f "$SYMLINK_PATH")
             FILENAME=$(basename "$SYMLINK_PATH")
-            echo "$TARGET_PATH"
-            echo "$SYMLINK_PATH"
-            echo "$FILENAME"
+            echo "target: $TARGET_PATH"
+            echo "symlink: $SYMLINK_PATH"
+            echo "fname: $FILENAME"
           
             # Check if the target file exists before processing
             if [ -e "$TARGET_PATH" ]; then
