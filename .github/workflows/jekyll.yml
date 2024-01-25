@@ -57,7 +57,7 @@ jobs:
       - name: Copy symlinked content
         run: |
           mkdir -p $GITHUB_WORKSPACE/_site/content/product
-          rsync -avL --exclude=".git" content/product $GITHUB_WORKSPACE/_site/content/product
+          rsync -avL --exclude=".git" --filter='-!*/' content/product/ $GITHUB_WORKSPACE/_site/content/product/
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
