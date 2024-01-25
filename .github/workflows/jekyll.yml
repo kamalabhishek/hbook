@@ -64,6 +64,8 @@ jobs:
           SYMLINK_PATH="content/product/docs.md"
           echo "symlink path $SYMLINK_PATH"
           URL=$(readlink $SYMLINK_PATH)
+          URL=${URL/github.com/raw.githubusercontent.com}
+          URL=${URL/blob\//}
           echo "url: $URL"
           FetchedContent=$(curl -s $URL)
           echo "fetched content: $FetchedContent"
