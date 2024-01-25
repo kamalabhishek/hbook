@@ -57,13 +57,13 @@ jobs:
  
       - name: Read and fetch data from symlinks
         run: |
-          ls
           SYMLINK_PATH="content/product/docs.md"
+          echo "symlink path $SYMLINK_PATH"
           URL=$(readlink $SYMLINK_PATH)
-          FetchedContent=$(curl -s $URL)
-          echo "$FetchedContent" > $SYMLINK_PATH
           echo "url: $URL"
+          FetchedContent=$(curl -s $URL)
           echo "fetched content: $FetchedContent"
+          echo "$FetchedContent" > $SYMLINK_PATH
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
