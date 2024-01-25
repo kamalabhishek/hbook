@@ -55,6 +55,10 @@ jobs:
       #     chmod +x .github/scripts/slink.sh
       #     .github/scripts/slink.sh
  
+      - name: List contents of the directory
+        run: |
+          cd $GITHUB_WORKSPACE
+          ls -lR
       - name: Read and fetch data from symlinks
         run: |
           SYMLINK_PATH="content/product/docs.md"
