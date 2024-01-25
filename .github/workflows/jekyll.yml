@@ -61,7 +61,8 @@ jobs:
           find . -type l -name "*.md" -exec sh -c '
             SYMLINK_PATH=$1
             FILENAME=$(basename "$SYMLINK_PATH")
-            URL=$(cat "$SYMLINK_PATH")
+            TARGET_PATH=$(readlink -f "$SYMLINK_PATH")
+            URL=$(cat "$TARGET_PATH")
             echo "url: $URL"
             echo "symlink: $SYMLINK_PATH"
             echo "fname: $FILENAME"
