@@ -60,17 +60,17 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/_site/content/product
           find . -type l -name "*.md" -exec sh -c '
             SYMLINK_PATH=$1
-            TARGET_PATH=$(realpath "$SYMLINK_PATH")
             FILENAME=$(basename "$SYMLINK_PATH")
-            echo "target: $TARGET_PATH"
+            URL=$(cat "$SYMLINK_PATH")
+            echo "url: $URL"
             echo "symlink: $SYMLINK_PATH"
             echo "fname: $FILENAME"
           
-            # Check if the target file exists before processing
-            if [ -e "$TARGET_PATH" ]; then
-              curl -L -o "$GITHUB_WORKSPACE/_site/content/product/$FILENAME" "$TARGET_PATH"
+            # Check if the URL is not empty
+            if [ -n "$URL" ]; then
+              curl -L -o "$GITHUB_WORKSPACE/_site/content/product/$FILENAME" "$URL"
             else
-              echo "Target file does not exist for symlink: $SYMLINK_PATH"
+              echo "URL is empty for symlink: $SYMLINK_PATH"
             fi
           ' _ {} \;
       - name: Build with Jekyll
