@@ -60,7 +60,7 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/_site/content/product
           find . -type l -name "*.md" -exec sh -c '
             SYMLINK_PATH=$1
-            TARGET_PATH=$(readlink -f "$SYMLINK_PATH")
+            TARGET_PATH=$(realpath "$SYMLINK_PATH")
             FILENAME=$(basename "$SYMLINK_PATH")
             echo "target: $TARGET_PATH"
             echo "symlink: $SYMLINK_PATH"
