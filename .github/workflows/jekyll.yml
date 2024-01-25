@@ -54,10 +54,15 @@ jobs:
       #     ls
       #     chmod +x .github/scripts/slink.sh
       #     .github/scripts/slink.sh
-      - name: Copy symlinked content
+      - name: Read and fetch data from symlinks
         run: |
           mkdir -p $GITHUB_WORKSPACE/_site/content/product
-          rsync -avL --exclude=".git" --filter='-! */' content/product/ $GITHUB_WORKSPACE/_site/content/product/
+          find . -type l -name "*.md" -exec sh -c '
+            SYMLINK_PATH=$1
+            URL=$(readlink -f $SYMLINK_PATH)
+            FILENAME=$(basename $SYMLINK_PATH)
+            curl -L -o $GITHUB_WORKSPACE/_site/content/product/$FILENAME $URL
+          ' _ {} \;
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
