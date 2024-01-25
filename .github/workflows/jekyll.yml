@@ -59,7 +59,7 @@ jobs:
         run: |
           mkdir -p $GITHUB_WORKSPACE/_site/content/product
           find . -type l -name "*.md" -exec sh -c '
-            SYMLINK_PATH=$1
+            SYMLINK_PATH="$1"
             FILENAME=$(basename "$SYMLINK_PATH")
             # Resolve the symlink's path using realpath
             TARGET_PATH=$(realpath "$GITHUB_WORKSPACE/$SYMLINK_PATH")
