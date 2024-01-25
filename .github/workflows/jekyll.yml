@@ -60,24 +60,24 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/_site/content/product
           find . -type l -name "*.md" -exec sh -c '
             SYMLINK_PATH=$1
-            URL=$(readlink -f $SYMLINK_PATH)
-            FILENAME=$(basename $SYMLINK_PATH)
-            
+            TARGET_PATH=$(readlink -f "$SYMLINK_PATH")
+            FILENAME=$(basename "$SYMLINK_PATH")
+          
             # Check if the target file exists before processing
-            if [ -e "$URL" ]; then
-              curl -L -o $GITHUB_WORKSPACE/_site/content/product/$FILENAME $URL
+            if [ -e "$TARGET_PATH" ]; then
+              curl -L -o "$GITHUB_WORKSPACE/_site/content/product/$FILENAME" "$TARGET_PATH"
             else
               echo "Target file does not exist for symlink: $SYMLINK_PATH"
             fi
           ' _ {} \;
-            - name: Build with Jekyll
-              # Outputs to the './_site' directory by default
-              run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
-              env:
-                JEKYLL_ENV: production
-            - name: Upload artifact
-              # Automatically uploads an artifact from the './_site' directory by default
-              uses: actions/upload-pages-artifact@v3
+      - name: Build with Jekyll
+        # Outputs to the './_site' directory by default
+        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+        env:
+          JEKYLL_ENV: production
+      - name: Upload artifact
+        # Automatically uploads an artifact from the './_site' directory by default
+        uses: actions/upload-pages-artifact@v3
 
   # Deployment job
   deploy:
