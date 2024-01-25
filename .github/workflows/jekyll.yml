@@ -58,8 +58,7 @@ jobs:
       - name: Read and fetch data from symlinks
         run: |
           mkdir -p $GITHUB_WORKSPACE/_site/content/product
-          find . -type l -name "*.md" -exec sh -c '
-            SYMLINK_PATH="$1"
+          find . -type l -name "*.md" | while read -r SYMLINK_PATH; do
             FILENAME=$(basename "$SYMLINK_PATH")
             # Resolve the symlink's path using realpath
             TARGET_PATH=$(realpath "$GITHUB_WORKSPACE/$SYMLINK_PATH")
@@ -75,7 +74,7 @@ jobs:
             else
               echo "URL is empty for symlink: $SYMLINK_PATH"
             fi
-          ' _ {} \;
+          done
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
