@@ -67,6 +67,7 @@ jobs:
           echo "url: $URL"
           FetchedContent=$(curl -s $URL)
           echo "fetched content: $FetchedContent"
+          rm $SYMLINK_PATH
           echo "$FetchedContent" > $SYMLINK_PATH
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
