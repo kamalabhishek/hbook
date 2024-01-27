@@ -55,22 +55,31 @@ jobs:
       #     chmod +x .github/scripts/slink.sh
       #     .github/scripts/slink.sh
  
-      - name: List contents of the directory
-        run: |
-          cd $GITHUB_WORKSPACE
-          ls -lR
       - name: Read and fetch data from symlinks
         run: |
-          SYMLINK_PATH="content/product/docs.md"
-          echo "symlink path $SYMLINK_PATH"
-          URL=$(readlink $SYMLINK_PATH)
-          URL=${URL/github.com/raw.githubusercontent.com}
-          URL=${URL/blob\//}
-          echo "url: $URL"
-          FetchedContent=$(curl -s $URL)
-          echo "fetched content: $FetchedContent"
-          rm $SYMLINK_PATH
-          echo "$FetchedContent" > $SYMLINK_PATH
+          # SYMLINK_PATH="content/product/docs.md"
+          # echo "symlink path $SYMLINK_PATH"
+          # URL=$(readlink $SYMLINK_PATH)
+          # URL=${URL/github.com/raw.githubusercontent.com}
+          # URL=${URL/blob\//}
+          # echo "url: $URL"
+          # FetchedContent=$(curl -s $URL)
+          # echo "fetched content: $FetchedContent"
+          # rm $SYMLINK_PATH
+          # echo "$FetchedContent" > $SYMLINK_PATH
+          
+          SYMLINKS=$(find . -type l)
+          # Iterate over each symlink
+          for SYMLINK_PATH in $SYMLINKS; do
+            URL=$(readlink $SYMLINK_PATH)
+            # Modify the URL
+            URL=${URL/github.com/raw.githubusercontent.com}
+            URL=${URL/blob\//}
+            FetchedContent=$(curl -s $URL)
+            rm $SYMLINK_PATH
+            echo "$FetchedContent" > $SYMLINK_PATH
+          done
+
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
