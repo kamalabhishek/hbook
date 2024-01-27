@@ -71,6 +71,7 @@ jobs:
           SYMLINKS=$(find . -type l)
           # Iterate over each symlink
           for SYMLINK_PATH in $SYMLINKS; do
+            echo "symlink path $SYMLINK_PATH"
             URL=$(readlink $SYMLINK_PATH)
             # Modify the URL
             URL=${URL/github.com/raw.githubusercontent.com}
