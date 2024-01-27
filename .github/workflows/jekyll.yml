@@ -79,6 +79,7 @@ jobs:
             URL=${URL/github.com/raw.githubusercontent.com}
             URL=${URL/blob\//}
             FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST_TOKEN }}" $URL)
+            echo "fetched content: $FetchedContent"
             rm $SYMLINK_PATH
             echo "$FetchedContent" > $SYMLINK_PATH
           done
