@@ -57,6 +57,10 @@ jobs:
       #     chmod +x .github/scripts/slink.sh
       #     .github/scripts/slink.sh
  
+      - name: Debug Repository Dispatch Event
+        run: |
+            echo "Event Payload: ${{ toJson(github.event.client_payload) }}"
+
       - name: Read and fetch data from symlinks
         run: |
           # SYMLINK_PATH="content/product/docs.md"
