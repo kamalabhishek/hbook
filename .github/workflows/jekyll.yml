@@ -56,10 +56,6 @@ jobs:
       #     ls
       #     chmod +x .github/scripts/slink.sh
       #     .github/scripts/slink.sh
- 
-      - name: Debug Repository Dispatch Event
-        run: |
-            echo "Event Payload: ${{ toJson(github.event.client_payload) }}"
 
       - name: Read and fetch data from symlinks
         run: |
@@ -82,7 +78,7 @@ jobs:
             # Modify the URL
             URL=${URL/github.com/raw.githubusercontent.com}
             URL=${URL/blob\//}
-            FetchedContent=$(curl -s $URL)
+            FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST_TOKEN }}" $URL)
             rm $SYMLINK_PATH
             echo "$FetchedContent" > $SYMLINK_PATH
           done
