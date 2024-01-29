@@ -32,6 +32,12 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
+      
+      - name: Clear Cache
+        run: |
+          git clean -ffdx
+          rm -rf ~/.bundle
+          bundle install
 
       - name: Read and fetch data from symlinks
         run: |
