@@ -18,12 +18,12 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Skyflow Team Handbook
+title: hbook
 # email: your-email@example.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Skyflow products, teams and processes.
+   products, teams and processes.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://skyflowapi.github.io/handbook" # the base hostname & protocol for your site, e.g. http://example.com
+url: "" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
 # github_username:  jekyll
 color_scheme: dark
@@ -70,4 +70,4 @@ exclude:
 #   - vendor/ruby/
 
 # Favicon
-favicon_ico: "/assets/images/skyflow_favicon.png"
+favicon_ico: "/assets/images/favicon.png"
