@@ -52,6 +52,7 @@ jobs:
       #       rm $SYMLINK_PATH
       #       echo "$FetchedContent" > $SYMLINK_PATH
       #     done
+
       - name: Read and fetch data from symlinks
         run: |
           SYMLINKS=$(find . -type l)
@@ -63,34 +64,24 @@ jobs:
             IFS='/' read -ra URL_PARTS <<< "$URL"
             OWNER="${URL_PARTS[3]}"
             REPO="${URL_PARTS[4]}"
-            PATH_IN_REPO="${URL_PARTS[@]:5}"
 
             # Fetch all files directly under the specified folder
-            API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs/"
-            echo "api-url: $API_URL"
-            # FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file" and .path | endswith(".md")).path')
-            FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file").download_url')
+            API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs"
+            FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file") | .name, .download_url')
             echo "FetchedFiles: $FetchedFiles"
 
             # Loop through fetched files and download them
-            for FILE_PATH in $FetchedFiles; do
-              FILE_URL="https://raw.githubusercontent.com/$OWNER/$REPO/main/$PATH_IN_REPO/$FILE_PATH"
-              FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" $FILE_URL)
-              echo "fetched content for $FILE_PATH: $FetchedContent"
-
-              # Create the target directory structure
-              TARGET_PATH="$SYMLINK_PATH/${FILE_PATH#$PATH_IN_REPO/}"
-              mkdir -p $(dirname "$TARGET_PATH")
+            while IFS= read -r FILE_NAME && IFS= read -r DOWNLOAD_URL; do
+              FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
+              TARGET_PATH="$SYMLINK_PATH/$FILE_NAME"
 
               # Replace symlink with fetched content
               echo "$FetchedContent" > "$TARGET_PATH"
-            done
+            done <<< "$FetchedFiles"
 
             # Remove the original symlink
             rm $SYMLINK_PATH
           done
-
-
 
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
