@@ -68,7 +68,7 @@ jobs:
             FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file") | .name, .download_url')
             echo "FetchedFiles: $FetchedFiles"
             # Extract the directory path without the filename
-            TARGET_PATH="$(dirname "$SYMLINK_PATH")/"
+            TARGET_PATH="$(dirname "$SYMLINK_PATH")"
             echo "TARGET_PATH: $TARGET_PATH"
             # Loop through fetched files and download them
             while IFS= read -r FILE_NAME && IFS= read -r DOWNLOAD_URL; do
