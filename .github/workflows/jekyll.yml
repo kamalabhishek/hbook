@@ -85,6 +85,7 @@ jobs:
               # Replace symlink with fetched content
               ls
               echo "filename: $FILE_NAME"
+              echo "target_path: $TARGET_PATH"
               echo "$FetchedContent" > "content/product/text.md"
             done <<< "$FetchedFiles"
 
