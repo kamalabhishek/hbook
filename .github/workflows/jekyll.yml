@@ -86,7 +86,7 @@ jobs:
               ls
               echo "filename: $FILE_NAME"
               echo "target_path: $TARGET_PATH"
-              echo "$FetchedContent" > "content/product/text.md"
+              echo "$FetchedContent" > "./content/product/text.md"
             done <<< "$FetchedFiles"
 
             # Remove the original symlink
