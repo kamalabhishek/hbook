@@ -85,7 +85,7 @@ jobs:
               # Replace symlink with fetched content
               ls
               echo "filename: $FILE_NAME"
-              # echo "$FetchedContent" > "$TARGET_PATH/$FILE_NAME"
+              echo "$FetchedContent" > "content/product/$FILE_NAME"
             done <<< "$FetchedFiles"
 
             # Remove the original symlink
