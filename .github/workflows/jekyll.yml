@@ -64,17 +64,15 @@ jobs:
             OWNER="${URL_PARTS[3]}"
             REPO="${URL_PARTS[4]}"
             PATH_IN_REPO="${URL_PARTS[@]:5}"
-            echo "path in repo: $PATH_IN_REPO"
 
             # Fetch all files directly under the specified folder
             API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/$PATH_IN_REPO"
-            echo "api_url: $API_URL"
+            echo "api-url: $API_URL"
             FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file" and .path | endswith(".md")).path')
-            echo "fetched files list: $FetchedFiles"
 
             # Loop through fetched files and download them
             for FILE_PATH in $FetchedFiles; do
-              FILE_URL="https://raw.githubusercontent.com/$OWNER/$REPO/main/$FILE_PATH"
+              FILE_URL="https://raw.githubusercontent.com/$OWNER/$REPO/main/$PATH_IN_REPO/$FILE_PATH"
               FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" $FILE_URL)
               echo "fetched content for $FILE_PATH: $FetchedContent"
 
@@ -89,6 +87,7 @@ jobs:
             # Remove the original symlink
             rm $SYMLINK_PATH
           done
+
 
 
       - name: Build with Jekyll
