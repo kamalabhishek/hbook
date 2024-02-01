@@ -59,33 +59,26 @@ jobs:
           for SYMLINK_PATH in $SYMLINKS; do
             echo "symlink path $SYMLINK_PATH"
             URL=$(readlink $SYMLINK_PATH)
-
             # Extract owner, repo, and path from the URL
             IFS='/' read -ra URL_PARTS <<< "$URL"
             OWNER="${URL_PARTS[3]}"
             REPO="${URL_PARTS[4]}"
-
             # Fetch all files directly under the specified folder
             API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs"
             FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file") | .name, .download_url')
             echo "FetchedFiles: $FetchedFiles"
-
             # Extract the directory path without the filename
-            TARGET_PATH="$(dirname "$SYMLINK_PATH")"
+            TARGET_PATH="$(dirname "$SYMLINK_PATH")/"
             echo "TARGET_PATH: $TARGET_PATH"
-
             # Loop through fetched files and download them
             while IFS= read -r FILE_NAME && IFS= read -r DOWNLOAD_URL; do
               FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
               echo "FetchedContent: $FetchedContent"
-
-              # Remove the .md extension from FILE_NAME
-              FILE_NAME_WITHOUT_EXT=$(basename "$FILE_NAME" .md")
-
               # Replace symlink with fetched content
-              echo "$FetchedContent" > "$TARGET_PATH/$FILE_NAME_WITHOUT_EXT"
+              echo "targettt: $TARGET_PATH/$FILE_NAME"
+              echo "$FetchedContent" > "$TARGET_PATH/$FILE_NAME"
+              echo "after fetched content"
             done <<< "$FetchedFiles"
-
             # Remove the original symlink
             echo "remove step"
             rm "$SYMLINK_PATH"
