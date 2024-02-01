@@ -64,10 +64,12 @@ jobs:
             OWNER="${URL_PARTS[3]}"
             REPO="${URL_PARTS[4]}"
             PATH_IN_REPO="${URL_PARTS[@]:5}"
+            echo "path in repo: $PATH_IN_REPO"
 
             # Fetch all files directly under the specified folder
             API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/$PATH_IN_REPO"
             FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file" and .path | endswith(".md")).path')
+            echo "fetched files list: $FetchedFiles"
 
             # Loop through fetched files and download them
             for FILE_PATH in $FetchedFiles; do
