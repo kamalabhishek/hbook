@@ -95,7 +95,7 @@ jobs:
             # Remove the original symlink
             echo "remove step"
             echo "sympath $SYMLINK_PATH"
-            # rm "$SYMLINK_PATH"
+            rm "$SYMLINK_PATH"
           done
 
 
