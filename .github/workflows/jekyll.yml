@@ -75,6 +75,7 @@ jobs:
               FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
               echo "FetchedContent: $FetchedContent"
               TARGET_PATH="$SYMLINK_PATH/$FILE_NAME"
+              echo "TARGET_PATH: $TARGET_PATH"
 
               # Replace symlink with fetched content
               echo "$FetchedContent" > "$TARGET_PATH"
