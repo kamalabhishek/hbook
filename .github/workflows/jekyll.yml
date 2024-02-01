@@ -76,7 +76,8 @@ jobs:
               echo "FetchedContent: $FetchedContent"
               # Replace symlink with fetched content
               echo "targettt: $TARGET_PATH/$FILE_NAME"
-              # echo "$FetchedContent" > "$TARGET_PATH/$FILE_NAME"
+              mkdir -p "$TARGET_PATH"
+              echo "$FetchedContent" > "$TARGET_PATH/$FILE_NAME"
               echo "after fetched content"
             done <<< "$FetchedFiles"
             # Remove the original symlink
