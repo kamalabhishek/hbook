@@ -68,6 +68,7 @@ jobs:
 
             # Fetch all files directly under the specified folder
             API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/$PATH_IN_REPO"
+            echo "api_url: $API_URL"
             FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file" and .path | endswith(".md")).path')
             echo "fetched files list: $FetchedFiles"
 
