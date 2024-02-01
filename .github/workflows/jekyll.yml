@@ -71,7 +71,7 @@ jobs:
             echo "FetchedFiles: $FetchedFiles"
 
             # Extract the directory path without the filename
-            TARGET_PATH="$(dirname "$SYMLINK_PATH")/"
+            TARGET_PATH="$(dirname "$SYMLINK_PATH")"
             echo "TARGET_PATH: $TARGET_PATH"
 
             # Loop through fetched files and download them
@@ -80,15 +80,14 @@ jobs:
               echo "FetchedContent: $FetchedContent"
 
               # Replace symlink with fetched content
-              echo "targettt: $TARGET_PATH/$FILE_NAME"
               echo "$FetchedContent" > "$TARGET_PATH/$FILE_NAME"
-              echo "after fetched content"
             done <<< "$FetchedFiles"
 
             # Remove the original symlink
             echo "remove step"
             rm "$SYMLINK_PATH"
           done
+
 
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
