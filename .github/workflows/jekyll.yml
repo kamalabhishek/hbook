@@ -86,14 +86,16 @@ jobs:
               ls -ld "$TARGET_PATH"
               echo "filename: $FILE_NAME"
               echo "target_path: $TARGET_PATH"
-              rm "$SYMLINK_PATH"
+              if [ -e "$SYMLINK_PATH" ]; then
+                rm "$SYMLINK_PATH"
+              fi
               echo "$FetchedContent" > "$TARGET_PATH/$FILE_NAME"
             done <<< "$FetchedFiles"
 
             # Remove the original symlink
             echo "remove step"
             echo "sympath $SYMLINK_PATH"
-            rm "$SYMLINK_PATH"
+            # rm "$SYMLINK_PATH"
           done
 
 
