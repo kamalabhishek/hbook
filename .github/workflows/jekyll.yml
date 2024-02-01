@@ -79,14 +79,18 @@ jobs:
               FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
               echo "FetchedContent: $FetchedContent"
 
+              # Remove the .md extension from FILE_NAME
+              FILE_NAME_WITHOUT_EXT=$(basename "$FILE_NAME" .md")
+
               # Replace symlink with fetched content
-              echo "$FetchedContent" > "$TARGET_PATH/$FILE_NAME"
+              echo "$FetchedContent" > "$TARGET_PATH/$FILE_NAME_WITHOUT_EXT"
             done <<< "$FetchedFiles"
 
             # Remove the original symlink
             echo "remove step"
             rm "$SYMLINK_PATH"
           done
+
 
 
       - name: Build with Jekyll
