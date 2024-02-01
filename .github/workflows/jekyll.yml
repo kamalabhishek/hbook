@@ -89,6 +89,8 @@ jobs:
               echo "target_path: $TARGET_PATH"
               # rm "$SYMLINK_PATH"
               echo "$FetchedContent" > "$TARGET_PATH/$FILE_NAME"
+              cd "$TARGET_PATH"
+              ls
             done <<< "$FetchedFiles"
 
             # Remove the original symlink
