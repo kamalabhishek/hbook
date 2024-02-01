@@ -73,6 +73,7 @@ jobs:
             # Loop through fetched files and download them
             while IFS= read -r FILE_NAME && IFS= read -r DOWNLOAD_URL; do
               FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
+              echo "FetchedContent: $FetchedContent"
               TARGET_PATH="$SYMLINK_PATH/$FILE_NAME"
 
               # Replace symlink with fetched content
@@ -80,6 +81,7 @@ jobs:
             done <<< "$FetchedFiles"
 
             # Remove the original symlink
+            echo "remove step"
             rm $SYMLINK_PATH
           done
 
