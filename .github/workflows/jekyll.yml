@@ -68,7 +68,8 @@ jobs:
             # Fetch all files directly under the specified folder
             API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs/"
             echo "api-url: $API_URL"
-            FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file" and .path | endswith(".md")).path')
+            # FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file" and .path | endswith(".md")).path')
+            FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file").download_url')
             echo "FetchedFiles: $FetchedFiles"
 
             # Loop through fetched files and download them
