@@ -99,7 +99,7 @@ jobs:
             # Remove the original symlink
             echo "remove step--- $SYMLINK_PATH"
             # if [ -e "$SYMLINK_PATH" ]; then
-            #   rm "$SYMLINK_PATH"
+              rm "$SYMLINK_PATH"
             # fi
           done
 
