@@ -98,10 +98,10 @@ jobs:
 
             # Remove the original symlink
             echo "remove step--- $SYMLINK_PATH"
-            if [ -e "$SYMLINK_PATH" ]; then
-              echo "outside if block: $SYMLINK_PATH"
-              rm "$SYMLINK_PATH"
-            fi
+            # if [ -e "$SYMLINK_PATH" ]; then
+            #   echo "outside if block: $SYMLINK_PATH"
+            #   rm "$SYMLINK_PATH"
+            # fi
           done
 
 
