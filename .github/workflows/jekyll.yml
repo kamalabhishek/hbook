@@ -68,7 +68,6 @@ jobs:
             # Fetch all files directly under the specified folder
             API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs"
             FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file") | .name, .download_url')
-            # echo "FetchedFiles: $FetchedFiles"
 
             # Extract the directory path without the filename
             TARGET_PATH="$(dirname "$SYMLINK_PATH")"
@@ -78,7 +77,7 @@ jobs:
             # Create the target directory structure if it doesn't exist
             mkdir -p "$TARGET_PATH"
 
-            rm "$SYMLINK_PATH"
+            # rm "$SYMLINK_PATH"
             # Loop through fetched files and download them
             while IFS= read -r FILE_NAME && IFS= read -r DOWNLOAD_URL; do
               FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
@@ -89,9 +88,9 @@ jobs:
               echo "filename: $FILE_NAME"
               echo "target_path: $TARGET_PATH"
               echo "SYMLINK_PATH: $SYMLINK_PATH"
-              if [ -e "$SYMLINK_PATH" ]; then
-                echo "inside if block: $SYMLINK_PATH"
-                rm "$SYMLINK_PATH"
+              # if [ -e "$SYMLINK_PATH" ]; then
+              #   echo "inside if block: $SYMLINK_PATH"
+              #   rm "$SYMLINK_PATH"
               fi
               echo "$FetchedContent" > "$TARGET_PATH/$FILE_NAME"
               echo "*********************************"
@@ -99,9 +98,9 @@ jobs:
 
             # Remove the original symlink
             echo "remove step--- $SYMLINK_PATH"
-            if [ -e "$SYMLINK_PATH" ]; then
-              rm "$SYMLINK_PATH"
-            fi
+            # if [ -e "$SYMLINK_PATH" ]; then
+            #   rm "$SYMLINK_PATH"
+            # fi
           done
 
 
