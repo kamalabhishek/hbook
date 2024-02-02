@@ -91,7 +91,7 @@ jobs:
               # if [ -e "$SYMLINK_PATH" ]; then
               #   echo "inside if block: $SYMLINK_PATH"
               #   rm "$SYMLINK_PATH"
-              fi
+              # fi
               echo "$FetchedContent" > "$TARGET_PATH/$FILE_NAME"
               echo "*********************************"
             done <<< "$FetchedFiles"
