@@ -77,7 +77,7 @@ jobs:
             # Create the target directory structure if it doesn't exist
             mkdir -p "$TARGET_PATH"
 
-            # rm "$SYMLINK_PATH"
+            rm "$SYMLINK_PATH"
             # Loop through fetched files and download them
             while IFS= read -r FILE_NAME && IFS= read -r DOWNLOAD_URL; do
               FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
