@@ -73,7 +73,7 @@ jobs:
             TARGET_PATH="$(dirname "$SYMLINK_PATH")"
 
             # Create the target directory structure if it doesn't exist
-            mkdir -p "$TARGET_PATH"
+            # mkdir -p "$TARGET_PATH"
 
             rm "$SYMLINK_PATH"
             # Loop through fetched files and download them
