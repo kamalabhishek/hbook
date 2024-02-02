@@ -1,1 +1,1 @@
-https://github.com/kamalabhishek/docs-test-repo/blob/main/docs/
+https://github.com/kamalabhishek/docs-test-repo/tree/main/docs
