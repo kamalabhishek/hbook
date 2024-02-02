@@ -64,9 +64,13 @@ jobs:
             IFS='/' read -ra URL_PARTS <<< "$URL"
             OWNER="${URL_PARTS[3]}"
             REPO="${URL_PARTS[4]}"
-
+            BRANCH=$(echo "$URL" | grep -oP '(?<=/tree/)[^/]+')
+            [ -z "$BRANCH" ] && BRANCH="main"
+            API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
+            echo "branch: $BRANCH"
+            
             # Fetch all files directly under the specified folder
-            API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs"
+            API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
             FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file") | .name, .download_url')
 
             # Extract the directory path without the filename
