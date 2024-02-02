@@ -88,10 +88,10 @@ jobs:
               echo "filename: $FILE_NAME"
               echo "target_path: $TARGET_PATH"
               echo "SYMLINK_PATH: $SYMLINK_PATH"
-              if [ -e "$SYMLINK_PATH" ]; then
-                echo "inside if block: $SYMLINK_PATH"
-                rm "$SYMLINK_PATH"
-              fi
+              # if [ -e "$SYMLINK_PATH" ]; then
+              #   echo "inside if block: $SYMLINK_PATH"
+              #   rm "$SYMLINK_PATH"
+              # fi
               echo "$FetchedContent" > "$TARGET_PATH/k$FILE_NAME"
               echo "*********************************"
             done <<< "$FetchedFiles"
