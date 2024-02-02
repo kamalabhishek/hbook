@@ -65,7 +65,10 @@ jobs:
             OWNER="${URL_PARTS[3]}"
             REPO="${URL_PARTS[4]}"
             BRANCH=$(echo "$URL" | grep -oP '(?<=/tree/)[^/]+')
+
+            # If the branch is not found, default to "main"
             [ -z "$BRANCH" ] && BRANCH="main"
+            
             API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
             echo "branch: $BRANCH"
             
