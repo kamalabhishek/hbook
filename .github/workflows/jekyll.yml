@@ -72,8 +72,17 @@ jobs:
             API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
             echo "branch: $BRANCH"
             
+            # Extract the path after '/tree/' and branch name
+            PATH_AFTER_TREE=$(echo "$URL" | grep -oP "(?<=/tree/$BRANCH/docs/).*")
+            # If there's no path, default to empty string
+            [ -z "$PATH_AFTER_TREE" ] && PATH_AFTER_TREE=""
+
             # Fetch all files directly under the specified folder
-            API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
+            # API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
+
+            # Construct API URL
+            API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs/$PATH_AFTER_TREE?ref=$BRANCH"
+
             FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file") | .name, .download_url')
 
             # Extract the directory path without the filename
