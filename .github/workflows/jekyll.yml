@@ -69,7 +69,7 @@ jobs:
             # If the branch is not found, default to "main"
             [ -z "$BRANCH" ] && BRANCH="main"
             
-            API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
+            # API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
             echo "branch: $BRANCH"
             
             # Extract the path after '/tree/' and branch name
@@ -81,6 +81,7 @@ jobs:
             # API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
 
             # Construct API URL
+            echo "PATH_AFTER_TREE: $PATH_AFTER_TREE"
             API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs/$PATH_AFTER_TREE?ref=$BRANCH"
             echo "API_URL: $API_URL"
 
