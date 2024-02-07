@@ -18,6 +18,9 @@ jobs:
       run: |
         git diff --name-status ${{ github.event.before }} ${{ github.sha }} > changed_files.txt
         echo "changed_files: $changed_files.txt"
+    
+    - name: Debug changed files
+      run: cat changed_files.txt
 
     - name: Check for symlink changes
       run: |
