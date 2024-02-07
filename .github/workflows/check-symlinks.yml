@@ -1,0 +1,31 @@
+name: Check Symlinks
+
+on:
+  pull_request:
+    paths:
+      - '**' # Trigger on any file change
+
+jobs:
+  check_symlinks:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: List changed files
+      id: list_changes
+      run: |
+        git diff --name-status ${{ github.event.before }} ${{ github.sha }} > changed_files.txt
+        echo "changed_files: $changed_files.txt"
+
+    - name: Check for symlink changes
+      run: |
+        grep -E '^(A|M) .* -> ' changed_files.txt > symlink_changes.txt
+        if [ -s symlink_changes.txt ]; then
+          echo "Symlink changes detected:"
+          cat symlink_changes.txt
+          exit 1
+        else
+          echo "No symlink changes detected."
+        fi
