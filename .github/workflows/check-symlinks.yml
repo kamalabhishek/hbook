@@ -63,7 +63,7 @@ jobs:
 
       - name: Find symlinks in folders
         run: |
-          find content/product/ -type l -exec dirname {} + | sort -u > symlink_folders.txt
+          find . -type l -exec dirname {} + | sort -u > symlink_folders.txt
 
       - name: Check for new files in symlink folders
         run: |
