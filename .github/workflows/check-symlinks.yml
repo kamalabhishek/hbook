@@ -47,9 +47,9 @@
 name: Symlink Check
 
 on:
-   pull_request:
-     paths:
-       - '**'
+  push:
+    branches:
+      - main
 
 jobs:
   check_symlinks:
@@ -58,15 +58,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Fetch main branch from remote
+        run: git fetch origin main:main
+
       - name: Find symlinks in folders
         run: |
           find . -type l -exec dirname {} + | sort -u > symlink_folders.txt
-          cat symlink_folders.txt
 
       - name: Check for new files in symlink folders
         run: |
           while IFS= read -r folder; do
-            if [ -n "$(git diff --name-only origin/main $folder)" ]; then
+            if [ -n "$(git diff --name-only main $folder)" ]; then
               echo "Error: New files added to symlink folder $folder"
               exit 1
             fi
