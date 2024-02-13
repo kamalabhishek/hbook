@@ -1,4 +1,4 @@
-name: Check Symlinks
+name: Check Symlinks and Folder Changes
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
       - '**' # Trigger on any file change
 
 jobs:
-  check_symlinks:
+  check_symlinks_and_folders:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,12 +17,9 @@ jobs:
       id: list_changes
       run: |
         git diff --name-status ${{ github.event.before }} ${{ github.sha }} > changed_files.txt
-        echo "changed_files: $changed_files.txt"
-    
-    - name: Debug changed files
-      run: cat changed_files.txt
 
     - name: Check for symlink changes
+      id: symlink_changes
       run: |
         grep -E '^(A|M) .* -> ' changed_files.txt > symlink_changes.txt
         if [ -s symlink_changes.txt ]; then
@@ -32,3 +29,14 @@ jobs:
         else
           echo "No symlink changes detected."
         fi
+
+    - name: Check for changes in symlink-containing folders
+      id: folder_changes
+      run: |
+        changed_folders=$(grep -E '^(A|M) .* -> ' changed_files.txt | awk -F/ '{print $1}' | sort -u)
+        for folder in $changed_folders; do
+          if [ -L "$folder" ]; then
+            echo "Symlink added in folder $folder. Disallowing merge of files from this folder."
+            exit 1
+          fi
+        done
