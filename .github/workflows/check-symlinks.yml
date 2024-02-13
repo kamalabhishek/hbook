@@ -67,10 +67,18 @@ jobs:
 
       - name: Check for new files in symlink folders
         run: |
+          # while IFS= read -r folder; do
+          #   if [ -n "$(git diff --name-only main $folder)" ]; then
+          #     echo "Error: New files added to symlink folder $folder"
+          #     exit 1
+          #   fi
+          # done < symlink_folders.txt
           while IFS= read -r folder; do
-            if [ -n "$(git diff --name-only main $folder)" ]; then
-              echo "Error: New files added to symlink folder $folder"
-              exit 1
+            if [ -d "$folder" ]; then
+              if [ -n "$(git diff --name-only origin/main $folder)" ]; then
+                echo "Error: New files added to symlink folder $folder"
+                exit 1
+              fi
             fi
           done < symlink_folders.txt
 
