@@ -87,11 +87,15 @@ jobs:
         run: |
           find . -type l -exec dirname {} + | sort -u > symlink_folders.txt
           cat symlink_folders.txt
+     
+      - name: Get previous commit hash
+        run: |
+          PREV_COMMIT=$(git rev-parse HEAD^)
 
       - name: Check for new files in symlink folders
         run: |
           while IFS= read -r folder; do
-            if [ -n "$(git diff --name-only HEAD~1 $folder)" ]; then
+            if [ -n "$(git diff --name-only $PREV_COMMIT $folder)" ]; then
               echo "Error: New files added to symlink folder $folder"
               exit 1
             fi
