@@ -47,9 +47,9 @@
 name: Symlink Check
 
 on:
-  push:
-    branches:
-      - main
+   pull_request:
+     paths:
+       - '**'
 
 jobs:
   check_symlinks:
