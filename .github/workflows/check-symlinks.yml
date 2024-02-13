@@ -90,7 +90,7 @@ jobs:
      
       - name: Get previous commit hash
         run: |
-          PREV_COMMIT=$(git log --format=%H -n 1 HEAD~1)
+          PREV_COMMIT=$(git rev-list -n 1 HEAD^)
 
       - name: Check for new files in symlink folders
         run: |
