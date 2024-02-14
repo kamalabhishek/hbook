@@ -67,7 +67,10 @@ jobs:
           cat symlink_folders.txt
      
       - name: Display changed files
-        run: git diff --name-only origin/main
+        run: |
+            git diff --name-only origin/main
+            git diff --name-only origin/main | xargs dirname | sort -u > changed_directories.txt
+            cat changed_directories.txt
       
       - name: Check for new files in symlink folders
         run: |
