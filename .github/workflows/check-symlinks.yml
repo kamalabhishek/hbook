@@ -90,19 +90,13 @@ jobs:
           #   fi
           # done < symlink_folders.txt
 
-          while IFS= read -r symlink_folder; do
-            echo "folder1: $symlink_folder"
-            # Check if the folder exists and is not the root directory
-            if [ -d "$symlink_folder" ] && [ "$symlink_folder" != "." ]; then
-              echo "folder2: $symlink_folder"
-              # Check if any changed files have the exact same path as the symlink-containing folder
-              if [ -n "$(git diff --name-only origin/main | grep "^$symlink_folder\$")" ]; then
-                echo "folder3: $symlink_folder"
-                echo "Error: New files added to symlink folder $symlink_folder"
-                exit 1
-              fi
+          while IFS= read -r changed_dir; do
+            # Check if the changed directory matches any symlink-containing folder
+            if grep -q "^$changed_dir\$" symlink_folders.txt; then
+              echo "Error: New files added to symlink folder $changed_dir"
+              exit 1
             fi
-          done < symlink_folders.txt
+          done < changed_directories.txt
 
       - name: Cleanup
         run: rm symlink_folders.txt
