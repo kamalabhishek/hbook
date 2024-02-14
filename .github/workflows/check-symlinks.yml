@@ -63,7 +63,7 @@ jobs:
 
       - name: Find symlinks in folders
         run: |
-          find . -type l -exec dirname {} + | sort -u > symlink_folders.txt
+          find . -type l -exec dirname {} + | sort -u | sed 's|^./||' > symlink_folders.txt
           cat symlink_folders.txt
      
       - name: Display changed files
