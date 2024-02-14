@@ -65,7 +65,10 @@ jobs:
         run: |
           find . -type l -exec dirname {} + | sort -u > symlink_folders.txt
           cat symlink_folders.txt
-
+     
+      - name: Display changed files
+        run: git diff --name-only origin/main
+      
       - name: Check for new files in symlink folders
         run: |
           # while IFS= read -r folder; do
