@@ -85,10 +85,12 @@ jobs:
 
           while IFS= read -r folder; do
             if [ -d "$folder" ]; then
-              echo "folder: $folder"
+              echo "folder1: $folder"
               # Check if the folder contains any symlink files
               if [ -n "$(find "$folder" -maxdepth 1 -type l)" ]; then
+                echo "folder2: $folder"
                 if [ -n "$(git diff --name-only origin/main $folder)" ]; then
+                  echo "folder3: $folder"
                   echo "Error: New files added to symlink folder $folder"
                   exit 1
                 fi
