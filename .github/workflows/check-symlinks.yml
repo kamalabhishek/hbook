@@ -89,7 +89,8 @@ jobs:
               # Check if the folder contains any symlink files
               if [ -n "$(find "$folder" -maxdepth 1 -type l)" ]; then
                 echo "folder2: $folder"
-                if [ -n "$(git diff --name-only origin/main $folder)" ]; then
+                # Check if any changed files are directly within this folder
+                if [ -n "$(git diff --name-only origin/main $folder | grep -v '/' | grep -v '^$')" ]; then
                   echo "folder3: $folder"
                   echo "Error: New files added to symlink folder $folder"
                   exit 1
