@@ -45,13 +45,38 @@ jobs:
       #     for SYMLINK_PATH in $SYMLINKS; do
       #       echo "symlink path $SYMLINK_PATH"
       #       URL=$(readlink $SYMLINK_PATH)
-      #       URL=${URL/github.com/raw.githubusercontent.com}
-      #       URL=${URL/blob\//}
-      #       FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" $URL)
-      #       echo "fetched content: $FetchedContent"
-      #       rm $SYMLINK_PATH
-      #       echo "$FetchedContent" > $SYMLINK_PATH
+
+      #       # Extract owner, repo, and path from the URL
+      #       IFS='/' read -ra URL_PARTS <<< "$URL"
+      #       OWNER="${URL_PARTS[3]}"
+      #       REPO="${URL_PARTS[4]}"
+      #       BRANCH=$(echo "$URL" | grep -oP '(?<=/tree/)[^/]+')
+
+      #       # If the branch is not found, default to "main"
+      #       [ -z "$BRANCH" ] && BRANCH="main"            
+      #       echo "branch: $BRANCH"
+
+      #       PATH_AFTER_TREE="${URL_PARTS[8]}"
+      #       # Construct API URL
+      #       echo "PATH_AFTER_TREE: $PATH_AFTER_TREE"
+      #       API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
+      #       echo "API_URL: $API_URL"
+
+      #       FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file") | .name, .download_url')
+      #       echo "FetchedFiles: $FetchedFiles"
+
+      #       # Extract the directory path without the filename
+      #       TARGET_PATH="$(dirname "$SYMLINK_PATH")"
+      #       rm "$SYMLINK_PATH"
+      #       # Loop through fetched files and download them
+      #       while IFS= read -r FILE_NAME && IFS= read -r DOWNLOAD_URL; do
+      #         FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
+      #         # Replace symlink with fetched content
+      #         echo "$FetchedContent" > "$TARGET_PATH/$FILE_NAME"
+      #       done <<< "$FetchedFiles"
       #     done
+
+
 
       - name: Read and fetch data from symlinks
         run: |
@@ -59,52 +84,53 @@ jobs:
           for SYMLINK_PATH in $SYMLINKS; do
             echo "symlink path $SYMLINK_PATH"
             URL=$(readlink $SYMLINK_PATH)
-
+      
             # Extract owner, repo, and path from the URL
             IFS='/' read -ra URL_PARTS <<< "$URL"
             OWNER="${URL_PARTS[3]}"
             REPO="${URL_PARTS[4]}"
             BRANCH=$(echo "$URL" | grep -oP '(?<=/tree/)[^/]+')
-
+      
             # If the branch is not found, default to "main"
             [ -z "$BRANCH" ] && BRANCH="main"
-            
-            # API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
             echo "branch: $BRANCH"
-            
-            # Extract the path after '/tree/' and branch name
-            # PATH_AFTER_TREE=$(echo "$URL" | grep -oP '(?<=/docs/)[^/]+')
-            # # If there's no path, default to empty string
-            # [ -z "$PATH_AFTER_TREE" ] && PATH_AFTER_TREE=""
-
-            # Fetch all files directly under the specified folder
-            # API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
-            PATH_AFTER_TREE="${URL_PARTS[8]}"
+            # PATH_AFTER_TREE="${URL_PARTS[@]:8}"
             # Construct API URL
-            echo "PATH_AFTER_TREE: $PATH_AFTER_TREE"
-            # API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs/$PATH_AFTER_TREE?ref=$BRANCH"
+            # echo "PATH_AFTER_TREE: $PATH_AFTER_TREE"
             API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
             echo "API_URL: $API_URL"
-
-            FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file") | .name, .download_url')
-            echo "FetchedFiles: $FetchedFiles"
-
+      
+            FetchedContents=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | .type, .path, .download_url')
+            echo "fetchedddd: $FetchedContents"
+      
             # Extract the directory path without the filename
             TARGET_PATH="$(dirname "$SYMLINK_PATH")"
-
-            # Create the target directory structure if it doesn't exist
-            # mkdir -p "$TARGET_PATH"
-
+      
+            # Remove existing symlink
             rm "$SYMLINK_PATH"
-            # Loop through fetched files and download them
-            while IFS= read -r FILE_NAME && IFS= read -r DOWNLOAD_URL; do
-              FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
-              
-              # Replace symlink with fetched content
-              echo "$FetchedContent" > "$TARGET_PATH/$FILE_NAME"
-            done <<< "$FetchedFiles"
+      
+            # Loop through fetched contents and download them
+            while IFS= read -r TYPE && IFS= read -r FILE_PATH && IFS= read -r DOWNLOAD_URL; do
+              echo "downloadd: $DOWNLOAD_URL"
+              if [ "$TYPE" == "dir" ]; then
+                # Fetch all files and folders recursively from directory
+                FetchedContents=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL" | jq -r '.[] | .type, .path, .download_url')
+                echo "fetched in iff: $FetchedContents"
+                while IFS= read -r SUB_TYPE && IFS= read -r SUB_FILE_PATH && IFS= read -r SUB_DOWNLOAD_URL; do
+                  FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$SUB_DOWNLOAD_URL")
+                  echo "sub fetched in if while: $FetchedContent"
+                  # Replace symlink with fetched content
+                  echo "$FetchedContent" > "$TARGET_PATH/$SUB_FILE_PATH"
+                done <<< "$FetchedContents"
+              else
+                # Fetch file content
+                FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
+                echo "fetched in else: $FetchedContent"
+                # Replace symlink with fetched content
+                echo "$FetchedContent" > "$TARGET_PATH/$FILE_PATH"
+              fi
+            done <<< "$FetchedContents"
           done
-
 
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
