@@ -124,7 +124,7 @@ jobs:
                   FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$SUB_DOWNLOAD_URL")
                   echo "sub fetched in if while: $FetchedContent"
                   # Replace symlink with fetched content
-                  echo "$FetchedContent" > "$TARGET_PATH/$FILE_PATH/$SUB_FILE_PATH"
+                  echo "$FetchedContent" > "$TARGET_PATH/$SUB_FILE_PATH"
                 done <<< "$FetchedContents"
               else
                 # Fetch file content
