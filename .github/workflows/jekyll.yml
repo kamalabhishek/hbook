@@ -100,7 +100,7 @@ jobs:
             API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
             echo "API_URL: $API_URL"
       
-            FetchedContents=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | .type, .path, .download_url')
+            FetchedContents=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r 'if .type == "dir" then "\(.type)\n\(.path)\n\(.url)" else "\(.type)\n\(.path)\n\(.download_url)" end')
             echo "fetchedddd: $FetchedContents"
       
             # Extract the directory path without the filename
