@@ -122,6 +122,7 @@ jobs:
                 FetchedContents=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL" | jq -r '.[] | .type, .path, .download_url')
                 echo "fetched in iff: $FetchedContents"
                 while IFS= read -r SUB_TYPE && IFS= read -r SUB_FILE_PATH && IFS= read -r SUB_DOWNLOAD_URL; do
+                  mkdir -p "$(dirname "$TARGET_PATH/$FILE_PATH/$SUB_FILE_PATH")"
                   FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$SUB_DOWNLOAD_URL")
                   echo "sub fetched in if while: $FetchedContent"
                   # Replace symlink with fetched content
