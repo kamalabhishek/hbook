@@ -131,6 +131,7 @@ jobs:
                 FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
                 echo "fetched in else: $FetchedContent"
                 # Replace symlink with fetched content
+                mkdir -p "$(dirname "$TARGET_PATH/$FILE_PATH")"
                 echo "$FetchedContent" > "$TARGET_PATH/$FILE_PATH"
               fi
             done <<< "$FetchedContents"
