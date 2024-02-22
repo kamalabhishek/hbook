@@ -114,15 +114,19 @@ jobs:
       
             # Loop through fetched contents and download them
             while IFS= read -r TYPE && IFS= read -r FILE_PATH && IFS= read -r DOWNLOAD_URL; do
+              SUB_FILE_PATH="${FILE_PATH#docs/}"
+              mkdir -p "$(dirname "$TARGET_PATH/$SUB_FILE_PATH")"
               echo "downloadd: $DOWNLOAD_URL"
               if [ "$TYPE" == "dir" ]; then
                 # FILE_PATH=${FILE_PATH#docs/}
-                mkdir -p "$TARGET_PATH/$FILE_PATH"
+                # mkdir -p "$TARGET_PATH/$FILE_PATH"
                 # Fetch all files and folders recursively from directory
                 FetchedContents=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL" | jq -r '.[] | .type, .path, .download_url')
                 echo "fetched in iff: $FetchedContents"
                 while IFS= read -r SUB_TYPE && IFS= read -r SUB_FILE_PATH && IFS= read -r SUB_DOWNLOAD_URL; do
-                  mkdir -p "$(dirname "$TARGET_PATH/$FILE_PATH/$SUB_FILE_PATH")"
+                  SUB_FILE_PATH="${SUB_FILE_PATH#docs/}"
+                  mkdir -p "$(dirname "$TARGET_PATH/$SUB_FILE_PATH")"
+                  # mkdir -p "$(dirname "$TARGET_PATH/$FILE_PATH/$SUB_FILE_PATH")"
                   FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$SUB_DOWNLOAD_URL")
                   echo "sub fetched in if while: $FetchedContent"
                   # Replace symlink with fetched content
@@ -133,7 +137,7 @@ jobs:
                 FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
                 echo "fetched in else: $FetchedContent"
                 # Replace symlink with fetched content
-                # FILE_PATH=${FILE_PATH#docs/}
+                FILE_PATH=${FILE_PATH#docs/}
                 mkdir -p "$(dirname "$TARGET_PATH/$FILE_PATH")"
                 echo "$FetchedContent" > "$TARGET_PATH/$FILE_PATH"
               fi
