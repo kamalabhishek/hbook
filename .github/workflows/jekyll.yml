@@ -74,6 +74,72 @@ jobs:
 
 
 
+      # - name: Read and fetch data from symlinks
+      #   run: |
+      #     SYMLINKS=$(find . -type l)
+      #     for SYMLINK_PATH in $SYMLINKS; do
+      #       echo "symlink path $SYMLINK_PATH"
+      #       URL=$(readlink $SYMLINK_PATH)
+      
+      #       # Extract owner, repo, and path from the URL
+      #       IFS='/' read -ra URL_PARTS <<< "$URL"
+      #       OWNER="${URL_PARTS[3]}"
+      #       REPO="${URL_PARTS[4]}"
+      #       BRANCH=$(echo "$URL" | grep -oP '(?<=/tree/)[^/]+')
+      
+      #       # If the branch is not found, default to "main"
+      #       [ -z "$BRANCH" ] && BRANCH="main"
+      #       echo "branch: $BRANCH"
+      #       # PATH_AFTER_TREE="${URL_PARTS[@]:8}"
+      #       # Construct API URL
+      #       # echo "PATH_AFTER_TREE: $PATH_AFTER_TREE"
+      #       API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
+      #       echo "API_URL: $API_URL"
+      
+      #       API_RESPONSE=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL")
+      #       echo "API_RESPONSE: $API_RESPONSE"
+      
+      #       FetchedContents=$(echo "$API_RESPONSE" | jq -r 'if type == "array" then .[] else . end | if .type == "dir" then "\(.type)\n\(.path)\n\(.url)" else "\(.type)\n\(.path)\n\(.download_url)" end')
+      #       echo "fetchedddd: $FetchedContents"
+      
+      #       # Extract the directory path without the filename
+      #       TARGET_PATH="$(dirname "$SYMLINK_PATH")"
+      
+      #       # Remove existing symlink
+      #       rm "$SYMLINK_PATH"
+      
+      #       # Loop through fetched contents and download them
+      #       while IFS= read -r TYPE && IFS= read -r FILE_PATH && IFS= read -r DOWNLOAD_URL; do
+      #         SUB_FILE_PATH="${FILE_PATH#docs/}"
+      #         mkdir -p "$(dirname "$TARGET_PATH/$SUB_FILE_PATH")"
+      #         echo "downloadd: $DOWNLOAD_URL"
+      #         if [ "$TYPE" == "dir" ]; then
+      #           # FILE_PATH=${FILE_PATH#docs/}
+      #           # mkdir -p "$TARGET_PATH/$FILE_PATH"
+      #           # Fetch all files and folders recursively from directory
+      #           FetchedContents=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL" | jq -r '.[] | .type, .path, .download_url')
+      #           echo "fetched in iff: $FetchedContents"
+      #           while IFS= read -r SUB_TYPE && IFS= read -r SUB_FILE_PATH && IFS= read -r SUB_DOWNLOAD_URL; do
+      #             SUB_FILE_PATH="${SUB_FILE_PATH#docs/}"
+      #             mkdir -p "$(dirname "$TARGET_PATH/$SUB_FILE_PATH")"
+      #             # mkdir -p "$(dirname "$TARGET_PATH/$FILE_PATH/$SUB_FILE_PATH")"
+      #             FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$SUB_DOWNLOAD_URL")
+      #             echo "sub fetched in if while: $FetchedContent"
+      #             # Replace symlink with fetched content
+      #             echo "$FetchedContent" > "$TARGET_PATH/$SUB_FILE_PATH"
+      #           done <<< "$FetchedContents"
+      #         else
+      #           # Fetch file content
+      #           FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
+      #           echo "fetched in else: $FetchedContent"
+      #           # Replace symlink with fetched content
+      #           FILE_PATH=${FILE_PATH#docs/}
+      #           mkdir -p "$(dirname "$TARGET_PATH/$FILE_PATH")"
+      #           echo "$FetchedContent" > "$TARGET_PATH/$FILE_PATH"
+      #         fi
+      #       done <<< "$FetchedContents"
+      #     done
+
       - name: Read and fetch data from symlinks
         run: |
           SYMLINKS=$(find . -type l)
@@ -90,17 +156,15 @@ jobs:
             # If the branch is not found, default to "main"
             [ -z "$BRANCH" ] && BRANCH="main"
             echo "branch: $BRANCH"
-            # PATH_AFTER_TREE="${URL_PARTS[@]:8}"
-            # Construct API URL
-            # echo "PATH_AFTER_TREE: $PATH_AFTER_TREE"
+      
             API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
             echo "API_URL: $API_URL"
       
             API_RESPONSE=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL")
             echo "API_RESPONSE: $API_RESPONSE"
       
-            FetchedContents=$(echo "$API_RESPONSE" | jq -r 'if type == "array" then .[] else . end | if .type == "dir" then "\(.type)\n\(.path)\n\(.url)" else "\(.type)\n\(.path)\n\(.download_url)" end')
-            echo "fetchedddd: $FetchedContents"
+            fetched_contents=$(echo "$API_RESPONSE" | jq -r 'if type == "array" then .[] else . end | if .type == "dir" then "\(.type)\n\(.path)\n\(.url)" else "\(.type)\n\(.path)\n\(.download_url)" end')
+            echo "fetched contents: $fetched_contents"
       
             # Extract the directory path without the filename
             TARGET_PATH="$(dirname "$SYMLINK_PATH")"
@@ -108,37 +172,35 @@ jobs:
             # Remove existing symlink
             rm "$SYMLINK_PATH"
       
-            # Loop through fetched contents and download them
+            fetch_recursive() {
+                local dir_url="$1"
+                local target_path="$2"
+                local fetched_contents=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$dir_url" | jq -r '.[] | .type, .path, .download_url')
+                while IFS= read -r sub_type && IFS= read -r sub_file_path && IFS= read -r sub_download_url; do
+                    if [ "$sub_type" == "dir" ]; then
+                        mkdir -p "$(dirname "$target_path/$sub_file_path")"
+                        fetch_recursive "$sub_download_url" "$target_path/$sub_file_path"
+                    else
+                        local fetched_content=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$sub_download_url")
+                        echo "sub fetched in recursive call: $fetched_content"
+                        echo "$fetched_content" > "$target_path/$sub_file_path"
+                    fi
+                done <<< "$fetched_contents"
+            }
+      
             while IFS= read -r TYPE && IFS= read -r FILE_PATH && IFS= read -r DOWNLOAD_URL; do
-              SUB_FILE_PATH="${FILE_PATH#docs/}"
-              mkdir -p "$(dirname "$TARGET_PATH/$SUB_FILE_PATH")"
-              echo "downloadd: $DOWNLOAD_URL"
-              if [ "$TYPE" == "dir" ]; then
-                # FILE_PATH=${FILE_PATH#docs/}
-                # mkdir -p "$TARGET_PATH/$FILE_PATH"
-                # Fetch all files and folders recursively from directory
-                FetchedContents=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL" | jq -r '.[] | .type, .path, .download_url')
-                echo "fetched in iff: $FetchedContents"
-                while IFS= read -r SUB_TYPE && IFS= read -r SUB_FILE_PATH && IFS= read -r SUB_DOWNLOAD_URL; do
-                  SUB_FILE_PATH="${SUB_FILE_PATH#docs/}"
-                  mkdir -p "$(dirname "$TARGET_PATH/$SUB_FILE_PATH")"
-                  # mkdir -p "$(dirname "$TARGET_PATH/$FILE_PATH/$SUB_FILE_PATH")"
-                  FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$SUB_DOWNLOAD_URL")
-                  echo "sub fetched in if while: $FetchedContent"
-                  # Replace symlink with fetched content
-                  echo "$FetchedContent" > "$TARGET_PATH/$SUB_FILE_PATH"
-                done <<< "$FetchedContents"
-              else
-                # Fetch file content
-                FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
-                echo "fetched in else: $FetchedContent"
-                # Replace symlink with fetched content
-                FILE_PATH=${FILE_PATH#docs/}
-                mkdir -p "$(dirname "$TARGET_PATH/$FILE_PATH")"
-                echo "$FetchedContent" > "$TARGET_PATH/$FILE_PATH"
-              fi
-            done <<< "$FetchedContents"
+                if [ "$TYPE" == "dir" ]; then
+                    fetch_recursive "$DOWNLOAD_URL" "$TARGET_PATH"
+                else
+                    fetched_content=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
+                    echo "fetched in else: $fetched_content"
+                    FILE_PATH=${FILE_PATH#docs/}
+                    mkdir -p "$(dirname "$TARGET_PATH/$FILE_PATH")"
+                    echo "$fetched_content" > "$TARGET_PATH/$FILE_PATH"
+                fi
+            done <<< "$fetched_contents"
           done
+
 
 
       - name: View folder structure
