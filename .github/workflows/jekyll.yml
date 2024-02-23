@@ -181,9 +181,13 @@ jobs:
                         mkdir -p "$(dirname "$target_path/$sub_file_path")"
                         fetch_recursive "$sub_download_url" "$target_path/$sub_file_path"
                     else
-                        local fetched_content=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$sub_download_url")
-                        echo "sub fetched in recursive call: $fetched_content"
-                        echo "$fetched_content" > "$target_path/$sub_file_path"
+                        if curl -s --head "$sub_download_url" | head -n 1 | grep "HTTP/1.[01] [23].." > /dev/null; then
+                            local fetched_content=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$sub_download_url")
+                            echo "sub fetched in recursive call: $fetched_content"
+                            echo "$fetched_content" > "$target_path/$sub_file_path"
+                        else
+                            echo "File not found: $sub_file_path"
+                        fi
                     fi
                 done <<< "$fetched_contents"
             }
@@ -192,14 +196,19 @@ jobs:
                 if [ "$TYPE" == "dir" ]; then
                     fetch_recursive "$DOWNLOAD_URL" "$TARGET_PATH"
                 else
-                    fetched_content=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
-                    echo "fetched in else: $fetched_content"
-                    FILE_PATH=${FILE_PATH#docs/}
-                    mkdir -p "$(dirname "$TARGET_PATH/$FILE_PATH")"
-                    echo "$fetched_content" > "$TARGET_PATH/$FILE_PATH"
+                    if curl -s --head "$DOWNLOAD_URL" | head -n 1 | grep "HTTP/1.[01] [23].." > /dev/null; then
+                        fetched_content=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
+                        echo "fetched in else: $fetched_content"
+                        FILE_PATH=${FILE_PATH#docs/}
+                        mkdir -p "$(dirname "$TARGET_PATH/$FILE_PATH")"
+                        echo "$fetched_content" > "$TARGET_PATH/$FILE_PATH"
+                    else
+                        echo "File not found: $FILE_PATH"
+                    fi
                 fi
             done <<< "$fetched_contents"
           done
+
 
 
 
