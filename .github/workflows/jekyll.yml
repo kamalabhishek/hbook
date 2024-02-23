@@ -165,7 +165,10 @@ jobs:
             mv "$TEMP_DIR/$OWNER-$REPO-"*"/docs"/* "$(dirname "$SYMLINK_PATH")"
             # Clean up temporary directory
             rm -rf "$TEMP_DIR"
+            # Remove the symlink
+            rm "$SYMLINK_PATH"
           done
+
 
 
       - name: View folder structure
