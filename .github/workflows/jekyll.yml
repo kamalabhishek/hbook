@@ -184,10 +184,12 @@ jobs:
                   if [ "$in_docs_folder" == true ]; then
                     # Strip the 'docs' prefix if already inside a 'docs' folder
                     FILE_PATH=${FILE_PATH#docs/}
+                    mkdir -p "$target_path"
+                    echo "$FetchedContent" > "$target_path/$FILE_PATH"
+                  else
+                    mkdir -p "$target_path/docs"
+                    echo "$FetchedContent" > "$target_path/docs/$FILE_PATH"
                   fi
-                  mkdir -p "$target_path/docs"
-                  mkdir -p "$(dirname "$target_path/docs/$FILE_PATH")"
-                  echo "$FetchedContent" > "$target_path/docs/$FILE_PATH"
                 fi
               done <<< "$fetched_contents"
             }
@@ -200,7 +202,6 @@ jobs:
             
             fetch_contents "$API_URL" "$TARGET_PATH" false
           done
-
 
 
       - name: View folder structure
