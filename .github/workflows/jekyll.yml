@@ -139,6 +139,7 @@ jobs:
       #         fi
       #       done <<< "$FetchedContents"
       #     done
+
       
       - name: Read and fetch data from symlinks
         run: |
@@ -158,10 +159,13 @@ jobs:
             API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
             echo "API_URL: $API_URL"
             # Fetch repository contents as a tarball
-            curl -sL -H "Authorization: token ${{ secrets.TEST }}" "https://api.github.com/repos/$OWNER/$REPO/tarball/$BRANCH" | tar -xz -C "$(dirname "$SYMLINK_PATH")"
+            TEMP_DIR=$(mktemp -d)
+            curl -sL -H "Authorization: token ${{ secrets.TEST }}" "https://api.github.com/repos/$OWNER/$REPO/tarball/$BRANCH" | tar -xz -C "$TEMP_DIR"
+            # Move only the contents of the docs directory to the symlink path
+            mv "$TEMP_DIR/$OWNER-$REPO-"*"/docs" "$(dirname "$SYMLINK_PATH")"
+            # Clean up temporary directory
+            rm -rf "$TEMP_DIR"
           done
-
-
 
 
       - name: View folder structure
