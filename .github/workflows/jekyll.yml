@@ -139,7 +139,7 @@ jobs:
       #         fi
       #       done <<< "$FetchedContents"
       #     done
-
+      
       - name: Read and fetch data from symlinks
         run: |
           SYMLINKS=$(find . -type l)
@@ -172,8 +172,10 @@ jobs:
               
               while IFS= read -r TYPE && IFS= read -r FILE_PATH && IFS= read -r DOWNLOAD_URL; do
                 if [ "$TYPE" == "dir" ]; then
-                  mkdir -p "$target_path/$FILE_PATH"
-                  fetch_contents "$DOWNLOAD_URL" "$target_path/$FILE_PATH"
+                  if [ "$FILE_PATH" != "docs" ]; then
+                    mkdir -p "$target_path/$FILE_PATH"
+                    fetch_contents "$DOWNLOAD_URL" "$target_path/$FILE_PATH"
+                  fi
                 else
                   FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
                   FILE_PATH=${FILE_PATH#docs/}
@@ -191,6 +193,7 @@ jobs:
             
             fetch_contents "$API_URL" "$TARGET_PATH"
           done
+
 
 
       - name: View folder structure
