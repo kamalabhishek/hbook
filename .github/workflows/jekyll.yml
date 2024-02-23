@@ -146,62 +146,31 @@ jobs:
           for SYMLINK_PATH in $SYMLINKS; do
             echo "symlink path $SYMLINK_PATH"
             URL=$(readlink $SYMLINK_PATH)
-            
             # Extract owner, repo, and path from the URL
             IFS='/' read -ra URL_PARTS <<< "$URL"
             OWNER="${URL_PARTS[3]}"
             REPO="${URL_PARTS[4]}"
             BRANCH=$(echo "$URL" | grep -oP '(?<=/tree/)[^/]+')
-            
             # If the branch is not found, default to "main"
-            [ -z "$BRANCH" ] && BRANCH="main"
+            [ -z "$BRANCH" ] && BRANCH="main"            
             echo "branch: $BRANCH"
-            
             # Construct API URL
             API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
             echo "API_URL: $API_URL"
-            
-            API_RESPONSE=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL")
-            echo "API_RESPONSE: $API_RESPONSE"
-            
-            fetch_contents() {
-              local download_url="$1"
-              local target_path="$2"
-              local in_docs_folder="$3"
-              
-              local fetched_contents=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$download_url" | jq -r 'if type == "array" then .[] else . end | if .type == "dir" then "\(.type)\n\(.path)\n\(.url)" else "\(.type)\n\(.path)\n\(.download_url)" end')
-              
-              while IFS= read -r TYPE && IFS= read -r FILE_PATH && IFS= read -r DOWNLOAD_URL; do
-                if [ "$TYPE" == "dir" ]; then
-                  if [ "$in_docs_folder" == true ] && [ "$FILE_PATH" == "docs" ]; then
-                    # Skip the 'docs' folder if already inside a 'docs' folder
-                    continue
-                  fi
-                  mkdir -p "$target_path/$FILE_PATH"
-                  fetch_contents "$DOWNLOAD_URL" "$target_path/$FILE_PATH" "$in_docs_folder"
-                else
-                  FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
-                  if [ "$in_docs_folder" == true ]; then
-                    # Strip the 'docs' prefix if already inside a 'docs' folder
-                    FILE_PATH=${FILE_PATH#docs/}
-                    mkdir -p "$target_path"
-                    echo "$FetchedContent" > "$target_path/$FILE_PATH"
-                  else
-                    mkdir -p "$target_path/docs"
-                    echo "$FetchedContent" > "$target_path/docs/$FILE_PATH"
-                  fi
-                fi
-              done <<< "$fetched_contents"
-            }
-            
+            FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file") | .name, .download_url')
+            echo "FetchedFiles: $FetchedFiles"
             # Extract the directory path without the filename
             TARGET_PATH="$(dirname "$SYMLINK_PATH")"
-            
-            # Remove existing symlink
+            # Remove symlink
             rm "$SYMLINK_PATH"
-            
-            fetch_contents "$API_URL" "$TARGET_PATH" false
+            # Loop through fetched files and download them
+            while IFS= read -r FILE_NAME && IFS= read -r DOWNLOAD_URL; do
+              FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
+              # Replace symlink with fetched content
+              echo "$FetchedContent" > "$TARGET_PATH/$FILE_NAME"
+            done <<< "$FetchedFiles"
           done
+
 
 
       - name: View folder structure
