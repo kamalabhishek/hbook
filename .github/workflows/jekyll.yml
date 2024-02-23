@@ -179,8 +179,9 @@ jobs:
                 else
                   FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
                   FILE_PATH=${FILE_PATH#docs/}
-                  mkdir -p "$(dirname "$target_path/$FILE_PATH")"
-                  echo "$FetchedContent" > "$target_path/$FILE_PATH"
+                  mkdir -p "$target_path/docs"
+                  mkdir -p "$(dirname "$target_path/docs/$FILE_PATH")"
+                  echo "$FetchedContent" > "$target_path/docs/$FILE_PATH"
                 fi
               done <<< "$fetched_contents"
             }
@@ -192,10 +193,8 @@ jobs:
             rm "$SYMLINK_PATH"
             
             fetch_contents "$API_URL" "$TARGET_PATH"
-            
-            # Remove the 'docs' directory itself
-            rm -rf "$TARGET_PATH/docs"
           done
+
 
 
 
