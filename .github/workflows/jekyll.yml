@@ -157,19 +157,10 @@ jobs:
             # Construct API URL
             API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/docs?ref=$BRANCH"
             echo "API_URL: $API_URL"
-            FetchedFiles=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$API_URL" | jq -r '.[] | select(.type == "file") | .name, .download_url')
-            echo "FetchedFiles: $FetchedFiles"
-            # Extract the directory path without the filename
-            TARGET_PATH="$(dirname "$SYMLINK_PATH")"
-            # Remove symlink
-            rm "$SYMLINK_PATH"
-            # Loop through fetched files and download them
-            while IFS= read -r FILE_NAME && IFS= read -r DOWNLOAD_URL; do
-              FetchedContent=$(curl -s -H "Authorization: token ${{ secrets.TEST }}" "$DOWNLOAD_URL")
-              # Replace symlink with fetched content
-              echo "$FetchedContent" > "$TARGET_PATH/$FILE_NAME"
-            done <<< "$FetchedFiles"
+            # Fetch repository contents as a tarball
+            curl -sL -H "Authorization: token ${{ secrets.TEST }}" "https://api.github.com/repos/$OWNER/$REPO/tarball/$BRANCH" | tar -xz -C "$(dirname "$SYMLINK_PATH")"
           done
+
 
 
 
