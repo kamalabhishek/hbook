@@ -162,7 +162,7 @@ jobs:
             TEMP_DIR=$(mktemp -d)
             curl -sL -H "Authorization: token ${{ secrets.TEST }}" "https://api.github.com/repos/$OWNER/$REPO/tarball/$BRANCH" | tar -xz -C "$TEMP_DIR"
             # Move only the contents of the docs directory to the symlink path
-            mv "$TEMP_DIR/$OWNER-$REPO-"*"/docs" "$(dirname "$SYMLINK_PATH")"
+            mv "$TEMP_DIR/$OWNER-$REPO-"*"/docs"/* "$(dirname "$SYMLINK_PATH")"
             # Clean up temporary directory
             rm -rf "$TEMP_DIR"
           done
