@@ -192,7 +192,11 @@ jobs:
             rm "$SYMLINK_PATH"
             
             fetch_contents "$API_URL" "$TARGET_PATH"
+            
+            # Remove the 'docs' directory itself
+            rm -rf "$TARGET_PATH/docs"
           done
+
 
 
 
