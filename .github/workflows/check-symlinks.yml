@@ -92,12 +92,24 @@ jobs:
           find . -type l -exec dirname {} + | sort -u | sed 's|^./||' > symlink_folders.txt
           cat symlink_folders.txt
 
-      - name: Display changed files
+      - name: Display changed files and directories
         run: |
           git diff --name-status origin/main | sort -u > changed_files.txt
           cat changed_files.txt
 
-      - name: Check for changes in symlink folders
+      - name: Check for deleted symlinks
+        run: |
+          while IFS= read -r symlink_dir; do
+            if ! grep -q "^$symlink_dir\$" changed_files.txt; then
+              # Check if the symlink folder is still present in the repository
+              if [ -d "$symlink_dir" ]; then
+                echo "Error: Symlink deleted from folder $symlink_dir"
+                exit 1
+              fi
+            fi
+          done < symlink_folders.txt
+
+      - name: Check for new symlinks
         run: |
           while IFS= read -r changed_file; do
             # Extract directory path of the changed file
@@ -105,29 +117,10 @@ jobs:
             
             # Check if the changed directory matches any symlink-containing folder
             if grep -q "^$changed_dir\$" symlink_folders.txt; then
-              # Check if the changed file is not a symlink
-              if ! [ -L "$changed_file" ]; then
-                echo "Error: New files added to symlink folder $changed_dir"
-                exit 1
-              fi
+              echo "Error: New symlink added to folder $changed_dir"
+              exit 1
             fi
           done < changed_files.txt
-
-      - name: Check for deleted symlinks
-        run: |
-          while IFS= read -r symlink_dir; do
-            # Check if the symlink folder is in the list of symlink folders
-            if grep -q "^$symlink_dir\$" symlink_folders.txt; then
-              # Check if the symlink folder is not found in the changed files list
-              if ! grep -q "^$symlink_dir\$" changed_files.txt; then
-                # Check if the symlink folder still exists in the repository
-                if [ -d "$symlink_dir" ]; then
-                  echo "Error: Symlink deleted from folder $symlink_dir"
-                  exit 1
-                fi
-              fi
-            fi
-          done < symlink_folders.txt
 
       - name: Cleanup
         run: rm symlink_folders.txt changed_files.txt
