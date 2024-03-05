@@ -96,7 +96,7 @@ jobs:
           
       - name: Display changed files
         run: |
-        
+          git diff --name-status origin/main > changed_files.txt
           # Extract directory paths of added and modified files
           echo "Added or modified files:"
           grep -E "^A\s" changed_files.txt | awk '{print $2}' | xargs -I {} sh -c 'if [ -L "{}" ]; then dirname "{}"; fi' | sort -u > added_directories.txt
