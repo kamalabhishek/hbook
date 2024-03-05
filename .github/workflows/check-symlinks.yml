@@ -91,6 +91,10 @@ jobs:
       - name: Display changed files
         run: |
           # List all added, modified, and deleted files
+          find . -type l -exec dirname {} + | sort -u | sed 's|^./||' > symlink_folders.txt
+          echo "ommm"
+          cat symlink_folders.txt
+          
           git diff --name-status origin/main > pr_changes.txt
           # awk '{print $2}' pr_changes.txt | xargs -I {} dirname {} | sort -u > pr_changes.txt
           awk '{print $2}' pr_changes.txt | xargs -I {} dirname {} | xargs -I {} basename {} | sort -u > pr_changes.txt
