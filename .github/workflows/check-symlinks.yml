@@ -66,10 +66,31 @@ jobs:
           find . -type l -exec dirname {} + | sort -u | sed 's|^./||' > symlink_folders.txt
           cat symlink_folders.txt
      
+      # - name: Display changed files
+      #   run: |
+      #       git diff --name-only origin/main | xargs dirname | sort -u > changed_directories.txt
+      #       cat changed_directories.txt
       - name: Display changed files
         run: |
-            git diff --name-only origin/main | xargs dirname | sort -u > changed_directories.txt
-            cat changed_directories.txt
+          # List all added and modified files
+          git diff --name-status origin/main > changed_files.txt
+        
+          # Extract directory paths of added and modified files
+          grep -E "^[AM]\s" changed_files.txt | awk '{print $2}' | xargs dirname | sort -u > added_modified_directories.txt
+        
+          # List all deleted files
+          grep -E "^D\s" changed_files.txt | awk '{print $2}' > deleted_files.txt
+        
+          # Extract directory paths of deleted files and append them to added_modified_directories.txt
+          cat deleted_files.txt | xargs dirname >> added_modified_directories.txt
+        
+          # Filter out symlink directories from the list of added and modified directories
+          grep -v -f <(find . -type l) added_modified_directories.txt | sort -u > changed_directories.txt
+        
+          # Cleanup temporary files
+          rm changed_files.txt added_modified_directories.txt deleted_files.txt
+          cat changed_directories.txt
+
       
       - name: Check for new files in symlink folders
         run: |
