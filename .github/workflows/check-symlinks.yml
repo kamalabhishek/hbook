@@ -65,23 +65,10 @@ jobs:
         run: |
           find . -type l -exec dirname {} + | sort -u | sed 's|^./||' > symlink_folders.txt
           cat symlink_folders.txt
-
-      - name: Filter out symlinks
-        id: filter_symlinks
-        run: |
-          if [ -n "${{ steps.list_changed_files.outputs.stdout }}" ]; then
-            grep -v '\.symlink' ${{ steps.list_changed_files.outputs.stdout }} | xargs dirname | sort -u > filtered_directories.txt
-            cat filtered_directories.txt
-          else
-            echo "No changed files found."
-          fi
-
+     
       - name: Display changed files
         run: |
-            # git diff --name-only origin/main | xargs dirname | sort -u > changed_directories.txt
-            grep -v '\.symlink' ${{ steps.list_changed_files.outputs.stdout }} | xargs dirname | sort -u > filtered_directories.txt
-            cat filtered_directories.txt
-            git diff --name-status origin/main | awk '$1 != "D" { print $2 }' | sort -u > changed_directories.txt
+            git diff --name-only origin/main | xargs dirname | sort -u > changed_directories.txt
             cat changed_directories.txt
       
       - name: Check for new files in symlink folders
