@@ -69,8 +69,9 @@ jobs:
       - name: Display changed files
         run: |
             # git diff --name-only origin/main | xargs dirname | sort -u > changed_directories.txt
-            git diff --name-status origin/main | awk '$1 != "D" { print $2 }' | xargs dirname | sort -u > changed_directories.txt
-            cat changed_directories.txt
+            git diff --name-status origin/main | awk '$1 != "D" { print $2 }' | sort -u > changed_files.txt
+            # cat changed_directories.txt
+            cat changed_files.txt
       
       - name: Check for new files in symlink folders
         run: |
