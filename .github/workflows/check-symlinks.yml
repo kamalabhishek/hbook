@@ -105,8 +105,9 @@ jobs:
           # List all deleted files
           echo "Deleted files:"
           grep -E "^D\s" changed_files.txt | awk '{print $2}' > deleted_files.txt
-          cat deleted_files.txt
+          
           awk '{print $2}' deleted_files.txt | xargs -I {} dirname {} | sort -u > deleted_directories.txt
+          cat deleted_directories.txt
         
           sort symlink_folders.txt -o symlink_folders_sorted.txt
           sort added_directories.txt -o added_directories_sorted.txt
