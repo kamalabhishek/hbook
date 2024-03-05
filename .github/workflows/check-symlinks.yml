@@ -1,3 +1,75 @@
+# name: Symlink Check
+
+# on:
+#   pull_request:
+#     paths:
+#       - '**'
+
+# jobs:
+#   check_symlinks:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v2
+
+#       - name: Fetch main branch from remote
+#         run: git fetch origin main:main
+      
+#       - name: Find symlinks in folders
+#         run: |
+#           find . -type l -exec dirname {} + | sort -u | sed 's|^./||' > symlink_folders.txt
+#           cat symlink_folders.txt
+          
+#       - name: Display added/deleted files
+#         run: |
+#           git diff --name-status origin/main > changed_files.txt
+#           # Extract directory paths of added and modified files
+#           echo "Added or modified files:"
+#           grep -E "^A\s" changed_files.txt | awk '{print $2}' | xargs -I {} sh -c 'if [ -L "{}" ]; then dirname "{}"; fi' | sort -u > added_directories.txt
+#           cat added_directories.txt
+#           sort symlink_folders.txt -o symlink_folders_sorted.txt
+#           sort added_directories.txt -o added_directories_sorted.txt
+        
+#           # Compare the sorted files and remove common directories from symlink_folders.txt
+#           comm -23 symlink_folders_sorted.txt added_directories_sorted.txt > symlink_folders_filtered.txt          
+         
+#           # Replace symlink_folders.txt with the filtered content
+#           mv symlink_folders_filtered.txt symlink_folders.txt        
+          
+#           # List all deleted files
+#           echo "Deleted files:"
+#           # grep -E "^D\s" changed_files.txt | awk '{print $2}' > deleted_files.txt
+#           grep -E "^D\s" changed_files.txt | awk '{print $2}' | xargs -I {} dirname {} | sort -u > deleted_files.txt
+#           cat deleted_files.txt
+
+#           cat symlink_folders.txt deleted_files.txt | sort -u > symlink_folders_updated.txt
+    
+#           # Replace symlink_folders.txt with the updated content
+#           mv symlink_folders_updated.txt symlink_folders.txt
+          
+#           # Cleanup temporary files
+#           # rm changed_files.txt added_directories.txt deleted_files.txt pr_changes.txt
+#           echo "finalleeeee"
+#           cat symlink_folders.txt
+          
+#       - name: Display changed files
+#         run: |
+#             git diff --name-only origin/main | xargs dirname | sort -u > changed_directories.txt
+#             cat changed_directories.txt
+
+#       - name: Check for new files in symlink folders
+#         run: |
+#           while IFS= read -r changed_dir; do
+#             # Check if the changed directory matches any symlink-containing folder
+#             if grep -q "^$changed_dir\$" symlink_folders.txt; then
+#               echo "Error: New files added to symlink folder $changed_dir"
+#               exit 1
+#             fi
+#           done < changed_directories.txt
+
+#       - name: Cleanup
+#         run: rm symlink_folders.txt
+
 name: Symlink Check
 
 on:
@@ -14,55 +86,35 @@ jobs:
 
       - name: Fetch main branch from remote
         run: git fetch origin main:main
-      
+
       - name: Find symlinks in folders
         run: |
           find . -type l -exec dirname {} + | sort -u | sed 's|^./||' > symlink_folders.txt
           cat symlink_folders.txt
-          
+
       - name: Display added/deleted files
         run: |
           git diff --name-status origin/main > changed_files.txt
-          # Extract directory paths of added and modified files
-          echo "Added or modified files:"
           grep -E "^A\s" changed_files.txt | awk '{print $2}' | xargs -I {} sh -c 'if [ -L "{}" ]; then dirname "{}"; fi' | sort -u > added_directories.txt
-          cat added_directories.txt
           sort symlink_folders.txt -o symlink_folders_sorted.txt
           sort added_directories.txt -o added_directories_sorted.txt
-        
-          # Compare the sorted files and remove common directories from symlink_folders.txt
           comm -23 symlink_folders_sorted.txt added_directories_sorted.txt > symlink_folders_filtered.txt          
-         
-          # Replace symlink_folders.txt with the filtered content
           mv symlink_folders_filtered.txt symlink_folders.txt        
-          
-          # List all deleted files
-          echo "Deleted files:"
-          # grep -E "^D\s" changed_files.txt | awk '{print $2}' > deleted_files.txt
           grep -E "^D\s" changed_files.txt | awk '{print $2}' | xargs -I {} dirname {} | sort -u > deleted_files.txt
-          cat deleted_files.txt
-
           cat symlink_folders.txt deleted_files.txt | sort -u > symlink_folders_updated.txt
-    
-          # Replace symlink_folders.txt with the updated content
           mv symlink_folders_updated.txt symlink_folders.txt
-          
-          # Cleanup temporary files
-          # rm changed_files.txt added_directories.txt deleted_files.txt pr_changes.txt
-          echo "finalleeeee"
-          cat symlink_folders.txt
-          
+
       - name: Display changed files
         run: |
             git diff --name-only origin/main | xargs dirname | sort -u > changed_directories.txt
             cat changed_directories.txt
-
+      
       - name: Check for new files in symlink folders
         run: |
           while IFS= read -r changed_dir; do
             # Check if the changed directory matches any symlink-containing folder
             if grep -q "^$changed_dir\$" symlink_folders.txt; then
-              echo "Error: New files added to symlink folder $changed_dir"
+              echo "Error: New files have been added to symlink-containing folders or existing symlinks have been deleted here: $changed_dir"
               exit 1
             fi
           done < changed_directories.txt
