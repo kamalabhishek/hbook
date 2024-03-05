@@ -95,7 +95,7 @@ jobs:
         
           # Extract directory paths of added and modified files
           echo "Added or modified files:"
-          grep -E "^A\s" changed_files.txt | awk '{print $2}' | xargs -I {} dirname {} | sort -u > added_directories.txt
+          grep -E "^A\s" changed_files.txt | awk '{print $2}' | xargs -I {} sh -c 'if [ -L "{}" ]; then dirname "{}"; fi' | sort -u > added_directories.txt
           cat added_directories.txt
         
           # List all deleted files
