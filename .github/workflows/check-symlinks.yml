@@ -63,15 +63,16 @@ jobs:
 
       - name: Display changed files
         run: |
-          # List all added and modified files
+          # List all added, modified, and deleted files
           git diff --name-status origin/main > changed_files.txt
-          cat changed_files.txt
-
+          
           # Extract directory paths of added and modified files
+          echo "Added or modified files:"
           grep -E "^A\s" changed_files.txt | awk '{print $2}' | xargs -I {} dirname {} | sort -u > added_directories.txt
           cat added_directories.txt
 
           # List all deleted files
+          echo "Deleted files:"
           grep -E "^D\s" changed_files.txt | awk '{print $2}' > deleted_files.txt
           cat deleted_files.txt
 
@@ -79,7 +80,7 @@ jobs:
           cat deleted_files.txt | xargs -I {} dirname {} >> added_directories.txt
           cat added_directories.txt
 
-          # Filter out symlink directories from the list of added directories
+          # Filter out newly added symlink directories from the list of added directories
           grep -v -f <(find . -type l | xargs dirname | sort -u) added_directories.txt | sort -u > changed_directories.txt
           cat changed_directories.txt
 
