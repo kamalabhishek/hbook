@@ -92,7 +92,8 @@ jobs:
         run: |
           # List all added, modified, and deleted files
           git diff --name-status origin/main > pr_changes.txt
-          awk '{print $2}' pr_changes.txt | xargs -I {} dirname {} | sort -u > pr_changes.txt
+          # awk '{print $2}' pr_changes.txt | xargs -I {} dirname {} | sort -u > pr_changes.txt
+          awk '{print $2}' pr_changes.txt | xargs -I {} dirname {} | xargs -I {} basename {} | sort -u > pr_changes.txt
           echo "changesss"
           cat pr_changes.txt
           git diff --name-status origin/main > changed_files.txt
