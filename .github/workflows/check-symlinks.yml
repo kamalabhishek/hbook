@@ -104,9 +104,9 @@ jobs:
         
           # List all deleted files
           echo "Deleted files:"
-          grep -E "^D\s" changed_files.txt | awk '{print $2}' > deleted_files.txt
-          grep -E "^D\s" changed_files.txt | awk '{print $2}' | xargs -I {} dirname {} | sort -u > hello.txt
-          cat hello.txt
+          # grep -E "^D\s" changed_files.txt | awk '{print $2}' > deleted_files.txt
+          grep -E "^D\s" changed_files.txt | awk '{print $2}' | xargs -I {} dirname {} | sort -u > deleted_files.txt
+          cat deleted_files.txt
 
           
           awk '{print $2}' deleted_files.txt | xargs -I {} dirname {} | sort -u > deleted_directories.txt
