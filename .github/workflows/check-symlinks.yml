@@ -88,19 +88,14 @@ jobs:
       #     rm changed_files.txt added_directories.txt deleted_files.txt
       #     echo "finale"
       #     cat changed_directories.txt
-      - name: Display changed files
+      
+      - name: Find symlinks in folders
         run: |
-          # List all added, modified, and deleted files
           find . -type l -exec dirname {} + | sort -u | sed 's|^./||' > symlink_folders.txt
-          echo "ommm"
           cat symlink_folders.txt
           
-          git diff --name-status origin/main > pr_changes.txt
-          # awk '{print $2}' pr_changes.txt | xargs -I {} dirname {} | sort -u > pr_changes.txt
-          awk '{print $2}' pr_changes.txt | xargs -I {} dirname {} | xargs -I {} basename {} | sort -u > pr_changes.txt
-          echo "changesss"
-          cat pr_changes.txt
-          git diff --name-status origin/main > changed_files.txt
+      - name: Display changed files
+        run: |
         
           # Extract directory paths of added and modified files
           echo "Added or modified files:"
@@ -118,22 +113,22 @@ jobs:
           # # Filter out directories that appear both in added/modified and deleted files lists
           # awk 'NR==FNR{a[$0]++; next} !a[$0]' filtered_directories.txt deleted_files.txt > changed_directories.txt
         
-          comm -23 <(sort added_directories.txt) <(sort pr_changes.txt) > changed_directories.txt
+          # comm -23 <(sort added_directories.txt) <(sort pr_changes.txt) > changed_directories.txt
           # Cleanup temporary files
-          rm changed_files.txt added_directories.txt deleted_files.txt pr_changes.txt
-          echo "finalleeeee"
-          cat changed_directories.txt
+          # rm changed_files.txt added_directories.txt deleted_files.txt pr_changes.txt
+          # echo "finalleeeee"
+          # cat changed_directories.txt
 
 
       - name: Check for new files in symlink folders
         run: |
           while IFS= read -r changed_dir; do
             # Check if the changed directory matches any symlink-containing folder
-            if grep -q "^$changed_dir\$" changed_directories.txt; then
+            if grep -q "^$changed_dir\$" symlink_folders.txt; then
               echo "Error: New files added to symlink folder $changed_dir"
               exit 1
             fi
           done < changed_directories.txt
 
       - name: Cleanup
-        run: rm changed_directories.txt
+        run: rm symlink_folders.txt
