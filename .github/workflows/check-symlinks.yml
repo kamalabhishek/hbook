@@ -93,7 +93,7 @@ jobs:
 
       - name: Display changed files
         run: |
-          git diff --name-status origin/main | awk '$1 != "D" { print $2 }' | sort -u > changed_files.txt
+          git diff --name-status origin/main | sort -u > changed_files.txt
           cat changed_files.txt
 
       - name: Check for changes in symlink folders
@@ -116,8 +116,11 @@ jobs:
         run: |
           while IFS= read -r symlink_dir; do
             if ! grep -q "^$symlink_dir\$" changed_files.txt; then
-              echo "Error: Symlink deleted from folder $symlink_dir"
-              exit 1
+              # Check if the symlink folder is still present in the repository
+              if [ -d "$symlink_dir" ]; then
+                echo "Error: Symlink deleted from folder $symlink_dir"
+                exit 1
+              fi
             fi
           done < symlink_folders.txt
 
