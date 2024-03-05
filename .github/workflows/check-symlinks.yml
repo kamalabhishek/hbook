@@ -61,31 +61,59 @@ jobs:
       - name: Fetch main branch from remote
         run: git fetch origin main:main
 
+      # - name: Display changed files
+      #   run: |
+      #     # List all added, modified, and deleted files
+      #     git diff --name-status origin/main > changed_files.txt
+          
+      #     # Extract directory paths of added and modified files
+      #     echo "Added or modified files:"
+      #     grep -E "^A\s" changed_files.txt | awk '{print $2}' | xargs -I {} dirname {} | sort -u > added_directories.txt
+      #     cat added_directories.txt
+          
+      #     # List all deleted files
+      #     echo "Deleted files:"
+      #     grep -E "^D\s" changed_files.txt | awk '{print $2}' > deleted_files.txt
+      #     cat deleted_files.txt
+      #     echo "changessss:"
+
+          
+      #     # Filter out newly added symlink directories from the list of added directories
+      #     grep -v -f <(find . -type l | xargs dirname | sort -u) added_directories.txt | sort -u > changed_directories.txt
+          
+      #     # Filter out directories that appear both in added/modified and deleted files lists
+      #     awk 'NR==FNR{a[$0]++; next} !a[$0]' added_directories.txt deleted_files.txt > changed_directories.txt
+          
+      #     # Cleanup temporary files
+      #     rm changed_files.txt added_directories.txt deleted_files.txt
+      #     echo "finale"
+      #     cat changed_directories.txt
       - name: Display changed files
         run: |
           # List all added, modified, and deleted files
           git diff --name-status origin/main > changed_files.txt
-          
+        
           # Extract directory paths of added and modified files
           echo "Added or modified files:"
           grep -E "^A\s" changed_files.txt | awk '{print $2}' | xargs -I {} dirname {} | sort -u > added_directories.txt
           cat added_directories.txt
-          
+        
           # List all deleted files
           echo "Deleted files:"
           grep -E "^D\s" changed_files.txt | awk '{print $2}' > deleted_files.txt
           cat deleted_files.txt
-          
+        
           # Filter out newly added symlink directories from the list of added directories
-          grep -v -f <(find . -type l | xargs dirname | sort -u) added_directories.txt | sort -u > changed_directories.txt
-          
+          grep -v -f <(find . -type l | xargs dirname | sort -u) added_directories.txt | sort -u > filtered_directories.txt
+        
           # Filter out directories that appear both in added/modified and deleted files lists
-          awk 'NR==FNR{a[$0]++; next} !a[$0]' added_directories.txt deleted_files.txt > changed_directories.txt
-          
+          awk 'NR==FNR{a[$0]++; next} !a[$0]' filtered_directories.txt deleted_files.txt > changed_directories.txt
+        
           # Cleanup temporary files
-          rm changed_files.txt added_directories.txt deleted_files.txt
-          echo "finale"
+          rm changed_files.txt added_directories.txt deleted_files.txt filtered_directories.txt
+          echo "finalleeeee"
           cat changed_directories.txt
+
 
       - name: Check for new files in symlink folders
         run: |
