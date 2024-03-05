@@ -116,7 +116,7 @@ jobs:
           grep -E "^D\s" changed_files.txt | awk '{print $2}' | xargs -I {} dirname {} | sort -u > deleted_files.txt
           cat deleted_files.txt
 
-          cat symlink_folders.txt deleted_directories.txt | sort -u > symlink_folders_updated.txt
+          cat symlink_folders.txt deleted_files.txt | sort -u > symlink_folders_updated.txt
     
           # Replace symlink_folders.txt with the updated content
           mv symlink_folders_updated.txt symlink_folders.txt
