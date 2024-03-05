@@ -85,6 +85,7 @@ jobs:
       # - name: Cleanup
       #   run: rm symlink_folders.txt
       
+
       - name: Find symlinks in folders
         run: |
           find . -type l -exec dirname {} + | sort -u | sed 's|^./||' > symlink_folders.txt
