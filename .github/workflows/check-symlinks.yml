@@ -114,7 +114,7 @@ jobs:
         
           comm -23 <(sort added_directories.txt) <(sort pr_changes.txt) > changed_directories.txt
           # Cleanup temporary files
-          rm changed_files.txt added_directories.txt deleted_files.txt filtered_directories.txt pr_changes.txt
+          rm changed_files.txt added_directories.txt deleted_files.txt pr_changes.txt
           echo "finalleeeee"
           cat changed_directories.txt
 
