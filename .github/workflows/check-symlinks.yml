@@ -61,66 +61,26 @@ jobs:
       - name: Fetch main branch from remote
         run: git fetch origin main:main
 
-      # - name: Find symlinks in folders
-      #   run: |
-      #     find . -type l -exec dirname {} + | sort -u | sed 's|^./||' > symlink_folders.txt
-      #     cat symlink_folders.txt
-     
-      # - name: Display changed files
-      #   run: |
-      #       # git diff --name-only origin/main | xargs dirname | sort -u > changed_directories.txt
-      #       git diff --name-status origin/main | awk '$1 != "D" { print $2 }' | sort -u > changed_directories.txt
-      #       cat changed_directories.txt
-      
-      # - name: Check for new files in symlink folders
-      #   run: |
-      #     while IFS= read -r changed_dir; do
-      #       # Check if the changed directory matches any symlink-containing folder
-      #       if grep -q "^$changed_dir\$" symlink_folders.txt; then
-      #         echo "Error: New files added to symlink folder $changed_dir"
-      #         exit 1
-      #       fi
-      #     done < changed_directories.txt
-
-      # - name: Cleanup
-      #   run: rm symlink_folders.txt
-      
-
-
       - name: Find symlinks in folders
         run: |
           find . -type l -exec dirname {} + | sort -u | sed 's|^./||' > symlink_folders.txt
           cat symlink_folders.txt
-
-      - name: Display changed files and directories
+     
+      - name: Display changed files
         run: |
-          git diff --name-status origin/main | sort -u > changed_files.txt
-          cat changed_files.txt
-
-      - name: Check for deleted symlinks
+            # git diff --name-only origin/main | xargs dirname | sort -u > changed_directories.txt
+            git diff --name-status origin/main | awk '$1 != "D" { print $2 }' | sort -u > changed_directories.txt
+            cat changed_directories.txt
+      
+      - name: Check for new files in symlink folders
         run: |
-          while IFS= read -r symlink_dir; do
-            if ! grep -q "^$symlink_dir\$" changed_files.txt; then
-              # Check if the symlink folder is still present in the repository
-              if [ -d "$symlink_dir" ]; then
-                echo "Error: Symlink deleted from folder $symlink_dir"
-                exit 1
-              fi
-            fi
-          done < symlink_folders.txt
-
-      - name: Check for new symlinks
-        run: |
-          while IFS= read -r changed_file; do
-            # Extract directory path of the changed file
-            changed_dir=$(dirname "$changed_file")
-            
+          while IFS= read -r changed_dir; do
             # Check if the changed directory matches any symlink-containing folder
             if grep -q "^$changed_dir\$" symlink_folders.txt; then
-              echo "Error: New symlink added to folder $changed_dir"
+              echo "Error: New files added to symlink folder $changed_dir"
               exit 1
             fi
-          done < changed_files.txt
+          done < changed_directories.txt
 
       - name: Cleanup
-        run: rm symlink_folders.txt changed_files.txt
+        run: rm symlink_folders.txt
