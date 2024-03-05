@@ -94,7 +94,7 @@ jobs:
           find . -type l -exec dirname {} + | sort -u | sed 's|^./||' > symlink_folders.txt
           cat symlink_folders.txt
           
-      - name: Display changed files
+      - name: Display added/deleted files
         run: |
           git diff --name-status origin/main > changed_files.txt
           # Extract directory paths of added and modified files
@@ -104,7 +104,7 @@ jobs:
         
           # List all deleted files
           echo "Deleted files:"
-          grep -E "^D\s" changed_files.txt | awk '{print $2}' > deleted_files.txt
+          grep -E "^D\s" changed_files.txt | awk '{print $2}' | xargs -I {} sh -c 'if [ -L "{}" ]; then dirname "{}"; fi' | sort -u > deleted_files.txt
           cat deleted_files.txt
         
           sort symlink_folders.txt -o symlink_folders_sorted.txt
