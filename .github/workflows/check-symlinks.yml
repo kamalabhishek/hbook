@@ -86,6 +86,7 @@ jobs:
       #   run: rm symlink_folders.txt
       
 
+
       - name: Find symlinks in folders
         run: |
           find . -type l -exec dirname {} + | sort -u | sed 's|^./||' > symlink_folders.txt
@@ -115,11 +116,15 @@ jobs:
       - name: Check for deleted symlinks
         run: |
           while IFS= read -r symlink_dir; do
-            if ! grep -q "^$symlink_dir\$" changed_files.txt; then
-              # Check if the symlink folder is still present in the repository
-              if [ -d "$symlink_dir" ]; then
-                echo "Error: Symlink deleted from folder $symlink_dir"
-                exit 1
+            # Check if the symlink folder is in the list of symlink folders
+            if grep -q "^$symlink_dir\$" symlink_folders.txt; then
+              # Check if the symlink folder is not found in the changed files list
+              if ! grep -q "^$symlink_dir\$" changed_files.txt; then
+                # Check if the symlink folder still exists in the repository
+                if [ -d "$symlink_dir" ]; then
+                  echo "Error: Symlink deleted from folder $symlink_dir"
+                  exit 1
+                fi
               fi
             fi
           done < symlink_folders.txt
