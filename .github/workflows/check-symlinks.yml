@@ -84,6 +84,8 @@ jobs:
           
           # Cleanup temporary files
           rm changed_files.txt added_directories.txt deleted_files.txt
+          echo "finale"
+          cat changed_directories.txt
 
       - name: Check for new files in symlink folders
         run: |
