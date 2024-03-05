@@ -107,17 +107,19 @@ jobs:
           grep -E "^D\s" changed_files.txt | awk '{print $2}' > deleted_files.txt
           cat deleted_files.txt
         
-          # # Filter out newly added symlink directories from the list of added directories
-          # grep -v -f <(find . -type l | xargs dirname | sort -u) added_directories.txt | sort -u > filtered_directories.txt
+          sort symlink_folders.txt -o symlink_folders_sorted.txt
+          sort added_directories.txt -o added_directories_sorted.txt
         
-          # # Filter out directories that appear both in added/modified and deleted files lists
-          # awk 'NR==FNR{a[$0]++; next} !a[$0]' filtered_directories.txt deleted_files.txt > changed_directories.txt
-        
-          # comm -23 <(sort added_directories.txt) <(sort pr_changes.txt) > changed_directories.txt
+          # Compare the sorted files and remove common directories from symlink_folders.txt
+          comm -23 symlink_folders_sorted.txt added_directories_sorted.txt > symlink_folders_filtered.txt
+    
+          # Replace symlink_folders.txt with the filtered content
+          mv symlink_folders_filtered.txt symlink_folders.txt
+          
           # Cleanup temporary files
           # rm changed_files.txt added_directories.txt deleted_files.txt pr_changes.txt
-          # echo "finalleeeee"
-          # cat changed_directories.txt
+          echo "finalleeeee"
+          cat symlink_folders.txt
 
 
       - name: Check for new files in symlink folders
