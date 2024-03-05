@@ -115,6 +115,11 @@ jobs:
     
           # Replace symlink_folders.txt with the filtered content
           mv symlink_folders_filtered.txt symlink_folders.txt
+
+          cat symlink_folders.txt deleted_files.txt | sort -u > symlink_folders_updated.txt
+    
+          # Replace symlink_folders.txt with the updated content
+          mv symlink_folders_updated.txt symlink_folders.txt
           
           # Cleanup temporary files
           # rm changed_files.txt added_directories.txt deleted_files.txt pr_changes.txt
