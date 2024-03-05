@@ -120,7 +120,11 @@ jobs:
           # rm changed_files.txt added_directories.txt deleted_files.txt pr_changes.txt
           echo "finalleeeee"
           cat symlink_folders.txt
-
+          
+      - name: Display changed files
+        run: |
+            git diff --name-only origin/main | xargs dirname | sort -u > changed_directories.txt
+            cat changed_directories.txt
 
       - name: Check for new files in symlink folders
         run: |
